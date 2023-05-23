@@ -3,7 +3,7 @@ import axios from 'axios';
 import logo from './logo.svg';
 import './App.css';
 
-import KnowledgeGraph from './KnowledgeGraph';
+import KnowledgeGraph from './graph_components/KnowledgeGraph';
 
 function App() {
 

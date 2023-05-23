@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
+import cxtmenu from 'cytoscape-cxtmenu'
+import ModelNode from './ModelNode';
 
 cytoscape.use( fcose );
+cytoscape.use( cxtmenu );
 
 export default function KnowledgeGraph() {
     const cytoscapeContainerRef = useRef(null);
@@ -12,13 +15,43 @@ export default function KnowledgeGraph() {
         // Initialize Cytoscape.js instance and attach it to the container
         const cy = cytoscape({
             container: cytoscapeContainerRef.current,
-            // Add your Cytoscape.js configuration options here
+            style: [
+                // Define styles for different types of nodes
+                {
+                  selector: 'node[type="model"]',
+                  style: {
+                    'content': 'data(name)',
+                    'background-color': 'orange',
+                  },
+                },
+              ],
         });
         cytoscapeInstanceRef.current = cy;
 
         // Add any initial graph creation or manipulation logic here
+
+        cy.cxtmenu({
+            selector: 'model',
+
+            commands: [
+                {
+                    content: 'bg1',
+                    select: function(){
+                        console.log( 'bg1' );
+                    }
+                },
+
+                {
+                    content: 'bg2',
+                    select: function(){
+                        console.log( 'bg2' );
+                    }
+                }
+            ]
+        });
+
         cy.add([{ group:'nodes', data:{ id: 'n0'}},
-                    { group:'nodes', data:{ id: 'n1'}},
+                    { group:'nodes', data:{ id: 'n1', type: 'model', name: 'maestro'}},
                     { group:'nodes', data:{ id: 'n2'}},
                     { group:'nodes', data:{ id: 'n3'}},
                     { group:'nodes', data:{ id: 'n4', parent: 'n37'}},
@@ -110,6 +143,19 @@ export default function KnowledgeGraph() {
             cy.destroy();
         };
     }, []);
+
+    const addNode = (nodeComponent) => {
+        const cy = cytoscapeInstanceRef.current;
+    
+        // Add the new node to the graph
+        cy.add({
+          data: nodeComponent.nodeData,
+        });
+    
+        // Apply layout or other graph manipulations if necessary
+    
+        // Update the state or trigger re-rendering if needed
+      };
     
     const randomizeGraph = () => {
         const cy = cytoscapeInstanceRef.current;
@@ -156,7 +202,9 @@ export default function KnowledgeGraph() {
             <h1>Graph Title</h1>
             <button onClick={randomizeGraph}>Randomize Graph</button>
             <button onClick={applyFcose}>fCoSE</button>
-            <div ref={cytoscapeContainerRef} style={{width: '100%', height: '80vh', textAlign: 'left'}}/>
+            <div ref={cytoscapeContainerRef} style={{width: '100%', height: '80vh', textAlign: 'left'}}>
+
+            </div>
         </div>
     );
     
