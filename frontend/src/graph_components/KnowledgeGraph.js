@@ -7,7 +7,7 @@ import ModelNode from './ModelNode';
 cytoscape.use( fcose );
 cytoscape.use( cxtmenu );
 
-export default function KnowledgeGraph() {
+function KnowledgeGraph() {
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
   
@@ -209,3 +209,5 @@ export default function KnowledgeGraph() {
     );
     
   }
+
+  export default KnowledgeGraph
