@@ -10,6 +10,13 @@ api = Flask(__name__)
 ddkg = DDKnowledgeGraph(DEFAULT_PATH)
 backend = SampleDiffusionCLI(DEFAULT_ENV)
 
+@api.route('/graph')
+def get_graph():
+    response = jsonify(ddkg.to_json())
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+
 @api.route('/import-model', methods=['POST'])
 def import_model():
     if ddkg.import_model(

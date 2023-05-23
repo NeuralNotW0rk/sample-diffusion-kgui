@@ -1,18 +1,21 @@
 import os
 import json
 from pathlib import Path
+from datetime import datetime
+from time import time
+import networkx as nx
 
 # subdirectories
-data_file = 'dd_log.json'
+data_file = 'ddkg.json'
 model_dir = 'models'
 
-class DDKnowledgeGraph:
+
+class DDKnowledgeGraph():
 
     def __init__(self, data_path, backend=None) -> None:
         self.root = Path(data_path)
         self.backend = backend
-        self.copy_all = False
-        self.data = {'models': {}}
+        self.G = nx.DiGraph()
         self.load()
 
     def load(self):
@@ -23,17 +26,19 @@ class DDKnowledgeGraph:
         # Load data json if it exists
         if os.path.exists(self.root / data_file):
             with open(self.root / data_file, 'r') as df:
-                self.data = json.load(df)
+                self.G = nx.cytoscape.cytoscape_graph(json.load(df))
 
 
     def save(self):
         with open(self.root / data_file, 'w') as df:
-            df.write(json.dumps(self.data, indent=4))
+            df.write(json.dumps(nx.cytoscape.cytoscape_data(self.G), indent=4))
+
+    def to_json(self):
+        return nx.cytoscape.cytoscape_data(self.G)
     
     # Add model to graph
     def import_model(
             self,
-            uuid,
             name,
             path,
             chunk_size,
@@ -43,22 +48,22 @@ class DDKnowledgeGraph:
             **kwargs
     ) -> bool:
         
-        # Model already exists
-        if name in self.data['models'].keys(): return False
-
         if copy:
             path_new = str(self.root / model_dir / Path(path).name)
             os.system(f'cp {path} {path_new}')
             path = path_new
 
-        self.data['models'][uuid] = {
-            'name': name,
-            'path': path,
-            'chunk_size': chunk_size,
-            'sample_rate': sample_rate,
-            'steps': steps,
-            **kwargs
-        }
+        # Model already exists
+        if name in nx.nodes(self.G): return False
+
+        self.G.add_node(
+            name,
+            type='model',
+            path=path,
+            chunk_size=chunk_size,
+            sample_rate=sample_rate,
+            steps=steps
+        )
         self.save()
 
         return True;
