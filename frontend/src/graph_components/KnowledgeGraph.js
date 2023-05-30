@@ -1,93 +1,104 @@
-import React, { useEffect, useRef, useState } from 'react';
-import cytoscape from 'cytoscape';
+import React, { createContext, useEffect, useRef, useState } from 'react';
+import cytoscape, { use } from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu'
-import ModelNode from './ModelNode';
+
+import ToolBox from '../tool_components/ToolBox';
+import defaultStyle from './GraphStyle';
 
 cytoscape.use( fcose );
 cytoscape.use( cxtmenu );
+
+const ToolContext = createContext();
 
 function KnowledgeGraph() {
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
+    const [activeTool, setActiveTool] = useState('default')
+    const [toolParams, setToolParams] = useState(null);
+    const [awaitingResponse, setAwaitingResponse] = useState(true);
+
+    // -----------------
+    //  COMPONENT SETUP
+    // -----------------
+
+    // Load graph from server
+    const fetchGraphData = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/graph');
+            const data = await response.json();
+            setGraphData(data);
+        } catch (error) {
+            console.error('Error fetching graph data:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchGraphData = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/graph');
-                const data = await response.json();
-                setGraphData(data);
-            } catch (error) {
-                console.error('Error fetching graph data:', error);
-            }
-        };
-
         fetchGraphData();
+        setAwaitingResponse(false);
     }, []);
   
+    // Initialize graph on data retreival
     useEffect(() => {
         if (graphData) {
-            // Initialize Cytoscape.js instance and attach it to the container'
+            // Initialize Cytoscape.js instance and attach it to the container
             const cy = cytoscape({
                 container: cytoscapeContainerRef.current,
-                style: [
-                    // Define styles for different types of nodes
-                    {
-                    selector: 'node[type="model"]',
-                    style: {
-                        'content': 'data(name)',
-                        'background-color': 'orange',
-                    },
-                    },
-                ],
-                elements: graphData.elements
+                elements: graphData.elements,
+                style: defaultStyle
             });
             cytoscapeInstanceRef.current = cy;
 
-            // Add any initial graph creation or manipulation logic here
+            // Context menu configuration
 
+            // Core component
             cy.cxtmenu({
-                selector: 'node[type="model"]',
-
+                selector: 'core',
+                menuRadius: 100,
                 commands: [
                     {
-                        content: 'bg1',
+                        content: 'Recenter view',
                         select: function(){
-                            console.log( 'bg1' );
+                            applyFcose();
                         }
                     },
 
                     {
-                        content: 'bg2',
+                        content: 'Import Model',
                         select: function(){
-                            console.log( 'bg2' );
+                            setActiveTool('importModel');
                         }
-                    }
+                    },
+                ]
+            });
+
+            cy.cxtmenu({
+                selector: 'node[type="model"]',
+                commands: [
+                    {
+                        content: 'Generate',
+                        select: function(ele){
+                            setActiveTool('generate');
+
+                            const nodeData = ele.json().data
+                            setToolParams({nodeData});
+                        }
+                    },
                 ]
             });
             
-
-            // Clean up the Cytoscape.js instance when the component unmounts
+    
             return () => {
                 cy.destroy();
             };
         }
     }, [graphData]);
 
-    const addNode = (nodeComponent) => {
-        const cy = cytoscapeInstanceRef.current;
-    
-        // Add the new node to the graph
-        cy.add({
-          data: nodeComponent.nodeData,
-        });
-    
-        // Apply layout or other graph manipulations if necessary
-    
-        // Update the state or trigger re-rendering if needed
-      };
+    // ------------------
+    //  LAYOUT FUNCTIONS
+    // ------------------
 
     const randomizeGraph = () => {
         const cy = cytoscapeInstanceRef.current;
@@ -99,7 +110,7 @@ function KnowledgeGraph() {
         });
           
         layout.run();  
-      };
+    };
 
     const applyFcose = () => {
         const cy = cytoscapeInstanceRef.current;
@@ -110,7 +121,7 @@ function KnowledgeGraph() {
             fit: true,
             uniformNodeDimensions: false,
             packComponents: true, // Pack to window
-            tile: true, // Tile disconnected
+            tile: true, // Tile disconnected nodes
             nodeRepulsion: 4500,
             idealEdgeLength: 50,
             edgeElasticity: 0.45,
@@ -128,18 +139,30 @@ function KnowledgeGraph() {
           
         layout.run();        
     };
+
+    // -----------
+    //  RENDERING
+    // -----------
   
     return (
-        <div>
-            <h1>Graph Title</h1>
-            <button onClick={randomizeGraph}>Randomize Graph</button>
-            <button onClick={applyFcose}>fCoSE</button>
-            <div ref={cytoscapeContainerRef} style={{width: '100%', height: '80vh', textAlign: 'left'}}>
+        <ToolContext.Provider value={{ activeTool, setActiveTool, toolParams, setToolParams, awaitingResponse, setAwaitingResponse }}>
+            <div className="flexbox-container">
+                <div className="toolbar">
+                    <h1>Test Graph</h1>
+                    <button onClick={fetchGraphData}>Refresh</button>
+                    {awaitingResponse ? (
+                        <h2>Waiting for response...</h2>
+                    ) : (
+                        <ToolBox/>
+                    )}
+                </div>
+                <div ref={cytoscapeContainerRef} style={{width: '100%', height: '100%', textAlign: 'left'}}/>
 
             </div>
-        </div>
+        </ToolContext.Provider>
     );
     
-  }
+}
 
-  export default KnowledgeGraph
+export default KnowledgeGraph
+export { ToolContext };
