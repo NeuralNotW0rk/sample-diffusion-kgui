@@ -56,39 +56,66 @@ function KnowledgeGraph() {
             // Core component
             cy.cxtmenu({
                 selector: 'core',
-                menuRadius: 100,
                 commands: [
                     {
                         content: 'Recenter view',
-                        select: function(){
+                        select: function() {
                             applyFcose();
                         }
                     },
 
                     {
                         content: 'Import Model',
-                        select: function(){
+                        select: function() {
                             setActiveTool('importModel');
                         }
                     },
                 ]
             });
 
+            // Model nodes
             cy.cxtmenu({
                 selector: 'node[type="model"]',
                 commands: [
                     {
                         content: 'Generate',
-                        select: function(ele){
+                        select: function(ele) {
                             setActiveTool('generate');
 
-                            const nodeData = ele.json().data
+                            const nodeData = ele.json().data;
                             setToolParams({nodeData});
                         }
                     },
+
+                    {
+                        content: 'Details',
+                        select: function(ele) {
+                            setActiveTool('details');
+                            
+                            const nodeData = ele.json().data;
+                            setToolParams({nodeData});
+                        }
+                    }
                 ]
             });
-            
+
+            // Audio nodes
+            cy.cxtmenu({
+                selector: 'node[type="audio"]',
+                commands: [
+                    {
+                        content: 'Details',
+                        select: function(ele) {
+                            setActiveTool('details');
+                            
+                            const nodeData = ele.json().data;
+                            setToolParams({nodeData});
+                        }
+                    }
+                ]
+            });
+
+            applyFcose();
     
             return () => {
                 cy.destroy();

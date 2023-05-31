@@ -48,10 +48,10 @@ def get_graph():
 @app.route('/import-model', methods=['POST'])
 def import_model():
     if ddkg.import_model(
-        name=request.form['modelName'],
-        path=request.form['modelPath'],
-        chunk_size=request.form['chunkSize'],
-        sample_rate=request.form['sampleRate'],
+        name=request.form['model_name'],
+        path=request.form['model_path'],
+        chunk_size=request.form['chunk_size'],
+        sample_rate=request.form['sample_rate'],
         steps=request.form['steps'],
         copy=True
     ):
@@ -87,8 +87,7 @@ def handle_sd_request():
         **{k : ARG_TYPES[k](v) if k in ARG_TYPES else v for k, v in request.form.items()}
     )
 
-    outputs = request_handler.process_request(sd_request)
-    ddkg.log_request(sd_request, outputs)
-
-    response = jsonify({'message': 'success'})
-    return response
+    response = request_handler.process_request(sd_request)
+    ddkg.log_request(sd_request, response)
+  
+    return jsonify({'message': 'success'})

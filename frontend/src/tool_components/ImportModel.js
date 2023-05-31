@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 
-function ImportModel({setAwaitingResponse}) {
+import { ToolContext } from "../graph_components/KnowledgeGraph";
 
-    const [responseMessage, setResponseMessage] = useState('');
+function ImportModel() {
+
+    const { setAwaitingResponse } = useContext(ToolContext);
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -20,12 +22,10 @@ function ImportModel({setAwaitingResponse}) {
             .then(response => response.json())
             .then(data => {
                 console.log(data.message); // Success message from the server
-                setResponseMessage(data.message);
                 setAwaitingResponse(false);
             })
             .catch(error => {
                 console.error('Error:', error);
-                setResponseMessage(error.message)
                 setAwaitingResponse(false);
             });
 
@@ -37,22 +37,22 @@ function ImportModel({setAwaitingResponse}) {
             <form method="post" onSubmit={handleSubmit}>
                 <label>
                     Model name:
-                    <input name="modelName" defaultValue="" />
+                    <input name="model_name" defaultValue="" />
                 </label>
                 <hr />
                 <label>
                     Model path:
-                    <input name="modelPath" defaultValue="" />
+                    <input name="model_path" defaultValue="" />
                 </label>
                 <hr />
                 <label>
                     Chunk size:
-                    <input name="chunkSize" type="number" defaultValue="65536" />
+                    <input name="chunk_size" type="number" defaultValue="65536" />
                 </label>
                 <hr />
                 <label>
                     Sample rate:
-                    <input name="sampleRate" type="number" defaultValue="44100" />
+                    <input name="sample_rate" type="number" defaultValue="44100" />
                 </label>
                 <hr />
                 <label>
@@ -62,7 +62,6 @@ function ImportModel({setAwaitingResponse}) {
                 <hr />
                 <button type="reset">Reset form</button>
                 <button type="submit">Submit form</button>
-                <p>{responseMessage}</p>
             </form>
         </div>
       );

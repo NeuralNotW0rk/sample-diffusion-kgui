@@ -22,3 +22,9 @@
   background-color: #282c34;
   flex: 1;
 }
+
+.attribute-list {
+  text-align: left;
+  text-overflow: clip;
+  list-style-type: none;
+}

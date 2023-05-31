@@ -4,6 +4,7 @@ import enum
 from pathlib import Path
 from time import time
 import networkx as nx
+import torchaudio
 
 # subdirectories
 data_file = 'ddkg.json'
@@ -71,11 +72,11 @@ class DDKnowledgeGraph():
         self.G.add_node(
             name,
             type='model',
-            path=path,
+            path=str(path),
             chunk_size=chunk_size,
             sample_rate=sample_rate,
             steps=steps,
-            created=time()
+            created=int(time())
         )
 
         # Save on success
@@ -85,25 +86,26 @@ class DDKnowledgeGraph():
     # Log generation
     def log_gen(
             self,
-            sample_dir,
-            sample_prefix,
             model_name,
+            sample_rate,
             chunk_size,
             batch_size,
             seed,
             steps,
             scheduler,
             sampler,
-            copy=False,
+            output,
             **kwargs
     ) -> bool:
         
         # Create batch node and main edge
+        current_time = int(time())
+        sample_prefix = f'{model_name}_{seed}_{current_time}'
         batch_name = f'batch_{sample_prefix}'
         self.G.add_node(
             batch_name,
             type='batch',
-            created=time()
+            created=current_time
         )
         self.G.add_edge(
             model_name,
@@ -116,26 +118,28 @@ class DDKnowledgeGraph():
             steps=steps,
             sampler=sampler,
             scheduler=scheduler,
-            created=time()
+            created=current_time
         )
+        batch_dir = check_dir(self.root / audio_dir / gen_dir / model_name)
 
-        # Create individual audio nodes
-        for i in range(batch_size):
-            audio_file = f'{sample_prefix}_{i + 1}.wav'
-            audio_path = Path(sample_dir) / audio_file
-            if copy:
-                audio_path_new = check_dir(self.root / audio_dir / gen_dir / model_name) / audio_file
-                os.system(f'cp {audio_path} {audio_path_new}')
-                audio_path = audio_path_new
+        # Create individual samples
+        for i, sample in enumerate(output):
+            # Save audio
+            audio_name = f'sample_{sample_prefix}_{i + 1}'
+            audio_path = batch_dir / f'{audio_name}.wav'
+            open(str(audio_path), 'a').close()
+            torchaudio.save(str(audio_path), sample.cpu(), sample_rate)
 
+            # Create node
             self.G.add_node(
-                audio_path.stem,
+                audio_name,
                 type='audio',
-                path=audio_path,
+                path=str(audio_path),
+                sample_rate=sample_rate,
                 created=time()
             )
             self.G.add_edge(
-                audio_path.stem,
+                audio_name,
                 batch_name,
                 type='batch_split',
                 created=time()
