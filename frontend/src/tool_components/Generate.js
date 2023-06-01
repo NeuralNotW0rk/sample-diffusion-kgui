@@ -22,9 +22,9 @@ function Generate() {
 
         setAwaitingResponse(true);
         fetch('http://localhost:5000/sd-request', {
-                method: 'POST',
-                body: formData
-            })
+            method: 'POST',
+            body: formData
+        })
             .then(response => response.json())
             .then(data => {
                 console.log(data.message); // Success message from the server
@@ -42,44 +42,44 @@ function Generate() {
             <h2>Generate</h2>
             <form method="post" onSubmit={handleSubmit}>
                 Model: {toolParams.nodeData.name}
-                <hr/>
+                <hr />
                 Sample rate: {toolParams.nodeData.sample_rate}
-                <hr/>
+                <hr />
                 <label>
                     Chunk size:
-                    <input name="chunk_size" type="number" defaultValue={toolParams.nodeData.chunk_size}/>
+                    <input name="chunk_size" type="number" defaultValue={toolParams.nodeData.chunk_size} />
                 </label>
-                <hr/>
+                <hr />
                 <label>
                     Batch size:
-                    <input name="batch_size" type="number" defaultValue="1"/>
+                    <input name="batch_size" type="number" defaultValue="1" />
                 </label>
-                <hr/>
+                <hr />
                 <label>
-                    Seed: 
-                    <input name="seed" type="number" defaultValue="0"/>
+                    Seed:
+                    <input name="seed" type="number" defaultValue="0" />
                 </label>
-                <hr/>
+                <hr />
                 <label>
                     Step count:
-                    <input name="steps" type="number" defaultValue="50"/>
+                    <input name="steps" type="number" defaultValue="50" />
                 </label>
-                <hr/>
+                <hr />
                 <label>
                     Sampler:
-                    <input name="sampler_type_name" defaultValue="V_IPLMS"/>
+                    <input name="sampler_type_name" defaultValue="V_IPLMS" />
                 </label>
-                <hr/>
+                <hr />
                 <label>
                     Scheduler:
-                    <input name="scheduler_type_name" defaultValue="V_CRASH"/>
+                    <input name="scheduler_type_name" defaultValue="V_CRASH" />
                 </label>
-                <hr/>
+                <hr />
                 <button type="reset">Clear</button>
                 <button type="submit">Generate</button>
             </form>
         </div>
-      );
+    );
 }
 
 export default Generate;

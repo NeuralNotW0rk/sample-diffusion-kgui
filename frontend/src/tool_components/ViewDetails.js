@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
 function ViewDetails() {
-    const {toolParams} = useContext(ToolContext);
+    const { toolParams } = useContext(ToolContext);
 
     return (
         <div>

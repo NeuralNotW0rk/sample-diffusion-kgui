@@ -1,7 +1,7 @@
 .app-container {
-  height: 100vh; /* Set the height to 100% of the viewport height */
+  height: 100vh;
   display: flex;
-  flex-direction: column; /* or row, depending on your layout */
+  flex-direction: column;
   color: whitesmoke;
 }
 
@@ -10,21 +10,20 @@
   background-color: black;
 }
 
+.main-content {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  background-color: #282c34;
+}
+
 .toolbar {
   text-align: center;
   width: 20%;
   background-color: #17191e;
 }
 
-.flexbox-container {
-  display: flex;
-  flex-direction: row;
-  background-color: #282c34;
-  flex: 1;
-}
-
 .attribute-list {
   text-align: left;
-  text-overflow: clip;
   list-style-type: none;
 }

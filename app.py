@@ -1,7 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 import torch
+import os
+from pathlib import Path
 
 from util.util import load_audio, crop_audio
 from util.platform import get_torch_device_type
@@ -18,12 +20,13 @@ ARG_TYPES = {
     # Model params
     'model_sample_rate': int,
     'model_chunk_size': int,
+    'created': int,
     
     # General inference
     'chunk_size': int,
     'batch_size': int,
     'steps': int,
-    'seed': int
+    'seed': int,
 }
 
 app = Flask(__name__)
@@ -38,10 +41,33 @@ request_handler = RequestHandler(device_accelerator, optimize_memory_use=False, 
 ddkg = RequestLogger(DEFAULT_PATH)
 
 
+# ---------------
+#  Data requests
+# ---------------
+
+# Sends lists of type names for samplers and schedulers
+@app.route('/sd-types', methods=['GET'])
+def get_type_names():
+    return jsonify({
+        'samplers': [e.value for e in SamplerType],
+        'schedulers': [e.value for e in SchedulerType]
+    })
+
+
 # Sends the current graph state
-@app.route('/graph')
+@app.route('/graph', methods=['GET'])
 def get_graph():
     return jsonify(ddkg.to_json())
+
+
+@app.route('/audio', methods=['GET'])
+def get_audio():
+    return jsonify({'url': str(ddkg.root.resolve().parent / request.args.get('path'))})
+
+
+# -----------------------
+#  External data sources
+# -----------------------
 
 
 # Copies a model to the ddkg dir
@@ -60,6 +86,11 @@ def import_model():
         message = f'Model import failed: model id {request.form["name"]} already exists'
     
     return jsonify({'message': message})
+
+
+# -----------------
+#  Model Inference
+# -----------------
 
 
 # Handles basic sample-diffusion requests with minimal interference
@@ -90,4 +121,18 @@ def handle_sd_request():
     response = request_handler.process_request(sd_request)
     ddkg.log_request(sd_request, response)
   
+    return jsonify({'message': 'success'})
+
+
+# --------------------
+#  Graph Modification
+# --------------------
+
+
+@app.route('/update-element', methods=['POST'])
+def update_element():
+    ddkg.update_element(
+        request.form['name'],
+        dict(request.form)
+    )
     return jsonify({'message': 'success'})

@@ -6,8 +6,8 @@ import cxtmenu from 'cytoscape-cxtmenu'
 import ToolBox from '../tool_components/ToolBox';
 import defaultStyle from './GraphStyle';
 
-cytoscape.use( fcose );
-cytoscape.use( cxtmenu );
+cytoscape.use(fcose);
+cytoscape.use(cxtmenu);
 
 const ToolContext = createContext();
 
@@ -37,9 +37,8 @@ function KnowledgeGraph() {
 
     useEffect(() => {
         fetchGraphData();
-        setAwaitingResponse(false);
     }, []);
-  
+
     // Initialize graph on data retreival
     useEffect(() => {
         if (graphData) {
@@ -59,14 +58,14 @@ function KnowledgeGraph() {
                 commands: [
                     {
                         content: 'Recenter view',
-                        select: function() {
+                        select: function () {
                             applyFcose();
                         }
                     },
 
                     {
                         content: 'Import Model',
-                        select: function() {
+                        select: function () {
                             setActiveTool('importModel');
                         }
                     },
@@ -79,21 +78,21 @@ function KnowledgeGraph() {
                 commands: [
                     {
                         content: 'Generate',
-                        select: function(ele) {
+                        select: function (ele) {
                             setActiveTool('generate');
 
                             const nodeData = ele.json().data;
-                            setToolParams({nodeData});
+                            setToolParams({ nodeData });
                         }
                     },
 
                     {
                         content: 'Details',
-                        select: function(ele) {
+                        select: function (ele) {
                             setActiveTool('details');
-                            
+
                             const nodeData = ele.json().data;
-                            setToolParams({nodeData});
+                            setToolParams({ nodeData });
                         }
                     }
                 ]
@@ -105,18 +104,39 @@ function KnowledgeGraph() {
                 commands: [
                     {
                         content: 'Details',
-                        select: function(ele) {
+                        select: function (ele) {
                             setActiveTool('details');
-                            
+
                             const nodeData = ele.json().data;
-                            setToolParams({nodeData});
+                            setToolParams({ nodeData });
+                        }
+                    },
+
+                    {
+                        content: 'Play',
+                        select: function (ele) {
+                            setActiveTool('playAudio');
+
+                            const nodeData = ele.json().data;
+                            setToolParams({ nodeData });
+                        }
+                    },
+
+
+                    {
+                        content: 'Edit',
+                        select: function (ele) {
+                            setActiveTool('updateAttributes');
+
+                            const nodeData = ele.json().data;
+                            setToolParams({ nodeData });
                         }
                     }
                 ]
             });
 
             applyFcose();
-    
+
             return () => {
                 cy.destroy();
             };
@@ -135,8 +155,8 @@ function KnowledgeGraph() {
             animate: true,
             animationDuration: 1000
         });
-          
-        layout.run();  
+
+        layout.run();
     };
 
     const applyFcose = () => {
@@ -161,34 +181,37 @@ function KnowledgeGraph() {
             tilingPaddingVertical: 10,
             tilingPaddingHorizontal: 10,
             initialEnergyOnIncremental: 3,
-            step:"all"
+            step: "all"
         });
-          
-        layout.run();        
+
+        layout.run();
     };
 
     // -----------
     //  RENDERING
     // -----------
-  
+
     return (
         <ToolContext.Provider value={{ activeTool, setActiveTool, toolParams, setToolParams, awaitingResponse, setAwaitingResponse }}>
-            <div className="flexbox-container">
+            <div className="main-content">
                 <div className="toolbar">
                     <h1>Test Graph</h1>
                     <button onClick={fetchGraphData}>Refresh</button>
                     {awaitingResponse ? (
-                        <h2>Waiting for response...</h2>
+                        <div>
+                            <h2>Waiting for response...</h2>
+                            <button onClick={setAwaitingResponse(false)}>Cancel</button>
+                        </div>
                     ) : (
-                        <ToolBox/>
+                        <ToolBox />
                     )}
                 </div>
-                <div ref={cytoscapeContainerRef} style={{width: '100%', height: '100%', textAlign: 'left'}}/>
+                <div ref={cytoscapeContainerRef} style={{ width: '80%', height: '100%', textAlign: 'left' }} />
 
             </div>
         </ToolContext.Provider>
     );
-    
+
 }
 
 export default KnowledgeGraph

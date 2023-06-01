@@ -104,6 +104,7 @@ class DDKnowledgeGraph():
         batch_name = f'batch_{sample_prefix}'
         self.G.add_node(
             batch_name,
+            alias=batch_name[-10:],
             type='batch',
             created=current_time
         )
@@ -133,6 +134,7 @@ class DDKnowledgeGraph():
             # Create node
             self.G.add_node(
                 audio_name,
+                alias=audio_name[-12:],
                 type='audio',
                 path=str(audio_path),
                 sample_rate=sample_rate,
@@ -148,3 +150,12 @@ class DDKnowledgeGraph():
         # Save on success
         self.save()
         return True
+
+
+    def update_element(
+            self,
+            name,
+            attrs
+    ):
+        nx.function.set_node_attributes(self.G, {name: attrs})
+        self.save()

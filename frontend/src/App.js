@@ -9,7 +9,7 @@ function App() {
       <header className='header'>
         <h1> Dance Diffusion KGUI </h1>
       </header>
-      <KnowledgeGraph/>
+      <KnowledgeGraph />
     </div>
   );
 }

@@ -29,7 +29,7 @@ const defaultStyle = [
     {
         selector: 'node[type="audio"]',
         style: {
-            'label': 'data(name)',
+            'label': 'data(alias)',
             'background-color': '#267',
             'width': 30,
             'height': 30,

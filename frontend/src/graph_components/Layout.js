@@ -18,7 +18,7 @@ const defaultFcose = {
     tilingPaddingVertical: 10,
     tilingPaddingHorizontal: 10,
     initialEnergyOnIncremental: 3,
-    step:"all"
+    step: "all"
 };
 
 export default defaultFcose;
