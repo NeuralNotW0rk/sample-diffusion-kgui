@@ -16,14 +16,13 @@ function ToolBox() {
       <div className="tab-buttons">
         <button
           className={activeTool === 0 ? 'active' : ''}
-          onClick={() => setActiveTool('importModel')}
+          onClick={() => setActiveTool('default')}
         >
-          Import Model
+          Clear
         </button>
       </div>
       <hr />
       <div className="tab-content">
-        {activeTool === 'default' && <div> Default panel </div>}
         {activeTool === 'importModel' && <ImportModel />}
         {activeTool === 'generate' && <Generate />}
         {activeTool === 'details' && <ViewDetails />}

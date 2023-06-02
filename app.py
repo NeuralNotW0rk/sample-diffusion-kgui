@@ -4,6 +4,7 @@ from flask_cors import CORS
 import torch
 import os
 from pathlib import Path
+import networkx as nx
 
 from util.util import load_audio, crop_audio
 from util.platform import get_torch_device_type
@@ -62,8 +63,8 @@ def get_graph():
 
 @app.route('/audio', methods=['GET'])
 def get_audio():
-    return jsonify({'url': str(ddkg.root.resolve().parent / request.args.get('path'))})
-
+    path = Path(ddkg.G.nodes[request.args.get('name')]['path']).resolve()
+    return send_file(str(path))
 
 # -----------------------
 #  External data sources
