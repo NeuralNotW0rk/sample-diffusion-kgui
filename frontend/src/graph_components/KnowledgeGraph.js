@@ -5,6 +5,7 @@ import cxtmenu from 'cytoscape-cxtmenu'
 
 import ToolBox from '../tool_components/ToolBox';
 import defaultStyle from './GraphStyle';
+import defaultLayout from './Layout';
 
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
@@ -16,9 +17,11 @@ function KnowledgeGraph() {
     const cytoscapeInstanceRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
+    const [typeNames, setTypeNames] = useState(null);
+
     const [activeTool, setActiveTool] = useState('default')
     const [toolParams, setToolParams] = useState(null);
-    const [awaitingResponse, setAwaitingResponse] = useState(true);
+    const [awaitingResponse, setAwaitingResponse] = useState(false);
 
     // -----------------
     //  COMPONENT SETUP
@@ -35,8 +38,22 @@ function KnowledgeGraph() {
         }
     };
 
+    const fetchTypeNames = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/sd-types');
+            const data = await response.json();
+            setTypeNames(data);
+        } catch (error) {
+            console.error('Error fetching type names:', error);
+        }
+    };
+
+    // Initialize graph data and type names
     useEffect(() => {
+        setAwaitingResponse(true);
         fetchGraphData();
+        fetchTypeNames();
+        setAwaitingResponse(false);
     }, []);
 
     // Initialize graph on data retreival
@@ -46,7 +63,8 @@ function KnowledgeGraph() {
             const cy = cytoscape({
                 container: cytoscapeContainerRef.current,
                 elements: graphData.elements,
-                style: defaultStyle
+                style: defaultStyle,
+                layout: defaultLayout
             });
             cytoscapeInstanceRef.current = cy;
 
@@ -161,28 +179,7 @@ function KnowledgeGraph() {
 
     const applyFcose = () => {
         const cy = cytoscapeInstanceRef.current;
-        var layout = cy.layout({
-            name: 'fcose',
-            animate: true,
-            animationEasing: 'ease-out',
-            fit: true,
-            uniformNodeDimensions: false,
-            packComponents: true, // Pack to window
-            tile: true, // Tile disconnected nodes
-            nodeRepulsion: 4500,
-            idealEdgeLength: 50,
-            edgeElasticity: 0.45,
-            nestingFactor: 0.1,
-            gravity: 0.25,
-            gravityRange: 3.8,
-            gravityCompound: 1,
-            gravityRangeCompound: 1.5,
-            numIter: 2500,
-            tilingPaddingVertical: 10,
-            tilingPaddingHorizontal: 10,
-            initialEnergyOnIncremental: 3,
-            step: "all"
-        });
+        var layout = cy.layout(defaultLayout);
 
         layout.run();
     };
@@ -192,7 +189,7 @@ function KnowledgeGraph() {
     // -----------
 
     return (
-        <ToolContext.Provider value={{ activeTool, setActiveTool, toolParams, setToolParams, awaitingResponse, setAwaitingResponse }}>
+        <ToolContext.Provider value={{ typeNames, activeTool, setActiveTool, toolParams, setAwaitingResponse }}>
             <div className="main-content">
                 <div className="toolbar">
                     <h1>Test Graph</h1>
@@ -200,7 +197,6 @@ function KnowledgeGraph() {
                     {awaitingResponse ? (
                         <div>
                             <h2>Waiting for response...</h2>
-                            <button onClick={setAwaitingResponse(false)}>Cancel</button>
                         </div>
                     ) : (
                         <ToolBox />
@@ -212,7 +208,7 @@ function KnowledgeGraph() {
         </ToolContext.Provider>
     );
 
-}
+};
 
 export default KnowledgeGraph
 export { ToolContext };

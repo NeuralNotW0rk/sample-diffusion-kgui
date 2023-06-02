@@ -4,6 +4,7 @@ import ImportModel from './ImportModel';
 import Generate from './Generate';
 import UpdateAttributes from './UpdateAttributes';
 import PlayAudio from './PlayAudio';
+import './Tools.css';
 
 import { ToolContext } from '../graph_components/KnowledgeGraph';
 

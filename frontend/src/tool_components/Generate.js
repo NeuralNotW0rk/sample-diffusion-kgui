@@ -1,11 +1,25 @@
 import React, { useContext, useState } from "react";
+import Select from 'react-select';
+import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
 function Generate() {
-    const { toolParams, setAwaitingResponse } = useContext(ToolContext);
-    const [selectedSampler, setSelectedSampler] = useState('');
-    const [selectedSchedule, setSelectedSchedule] = useState('');
+    const defaultSampler = 'V_IPLMS';
+    const defaultScheduler = 'V_CRASH';
+
+    const { typeNames, toolParams, setAwaitingResponse } = useContext(ToolContext);
+    const [selectedSampler, setSelectedSampler] = useState({value: defaultSampler, label: defaultSampler});
+    const [selectedScheduler, setSelectedScheduler] = useState({value: defaultScheduler, label: defaultScheduler});
+
+    const samplerOptions = typeNames.samplers.map((value) => ({
+        value,
+        label: value
+    }));
+    const schedulerOptions = typeNames.schedulers.map((value) => ({
+        value,
+        label: value
+    }));
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -18,7 +32,9 @@ function Generate() {
         formData.append('model_name', toolParams.nodeData.name);
         formData.append('model_path', toolParams.nodeData.path);
         formData.append('model_sample_rate', toolParams.nodeData.sample_rate);
-        formData.append('model_chunk_size', toolParams.nodeData.chunk_size)
+        formData.append('model_chunk_size', toolParams.nodeData.chunk_size);
+        formData.append('sampler_type_name', selectedSampler.value);
+        formData.append('scheduler_type_name', selectedScheduler.value);
 
         setAwaitingResponse(true);
         fetch('http://localhost:5000/sd-request', {
@@ -27,12 +43,12 @@ function Generate() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message); // Success message from the server
                 setAwaitingResponse(false);
+                console.log(data.message); // Success message from the server
             })
             .catch(error => {
-                console.error('Error:', error);
                 setAwaitingResponse(false);
+                console.error('Error:', error);
             });
     };
 
@@ -67,12 +83,22 @@ function Generate() {
                 <hr />
                 <label>
                     Sampler:
-                    <input name="sampler_type_name" defaultValue="V_IPLMS" />
+                    <Select
+                        options={samplerOptions}
+                        defaultValue={selectedSampler}
+                        onChange={setSelectedSampler}
+                        className="custom-select"
+                    />
                 </label>
                 <hr />
                 <label>
                     Scheduler:
-                    <input name="scheduler_type_name" defaultValue="V_CRASH" />
+                    <Select
+                        options={schedulerOptions}
+                        defaultValue={selectedScheduler}
+                        onChange={setSelectedScheduler}
+                        className="custom-select"
+                    />
                 </label>
                 <hr />
                 <button type="reset">Clear</button>

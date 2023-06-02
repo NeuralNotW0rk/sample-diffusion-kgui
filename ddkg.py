@@ -42,6 +42,7 @@ class DDKnowledgeGraph():
                 self.G = nx.cytoscape.cytoscape_graph(json.load(df))
 
     def save(self):
+        os.system(f'cp {self.root / data_file} {self.root / data_file}_backup')
         with open(self.root / data_file, 'w') as df:
             df.write(json.dumps(nx.cytoscape.cytoscape_data(self.G), indent=4))
 

@@ -16,14 +16,3 @@
   flex: 1;
   background-color: #282c34;
 }
-
-.toolbar {
-  text-align: center;
-  width: 20%;
-  background-color: #17191e;
-}
-
-.attribute-list {
-  text-align: left;
-  list-style-type: none;
-}

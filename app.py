@@ -46,6 +46,7 @@ ddkg = RequestLogger(DEFAULT_PATH)
 #  Data requests
 # ---------------
 
+
 # Sends lists of type names for samplers and schedulers
 @app.route('/sd-types', methods=['GET'])
 def get_type_names():
@@ -61,10 +62,12 @@ def get_graph():
     return jsonify(ddkg.to_json())
 
 
+# Sends an audio file corresponding to the given name
 @app.route('/audio', methods=['GET'])
 def get_audio():
     path = Path(ddkg.G.nodes[request.args.get('name')]['path']).resolve()
     return send_file(str(path))
+
 
 # -----------------------
 #  External data sources

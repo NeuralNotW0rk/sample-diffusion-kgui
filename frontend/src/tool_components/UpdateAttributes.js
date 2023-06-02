@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
@@ -13,6 +14,9 @@ function UpdateAttributes() {
         const form = e.target;
         const formData = new FormData(form);
         formData.append('name', toolParams.nodeData.name);
+        formData.get('alias') === '' && formData.delete('alias');
+        formData.get('tags') === '' && formData.delete('tags');
+        formData.get('caption') === '' && formData.delete('caption');
 
         setAwaitingResponse(true);
         fetch('http://localhost:5000/update-element', {

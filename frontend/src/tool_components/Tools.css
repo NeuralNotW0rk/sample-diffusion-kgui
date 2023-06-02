@@ -1,0 +1,14 @@
+.toolbar {
+    text-align: center;
+    width: 20%;
+    background-color: #17191e;
+}
+
+.attribute-list {
+    text-align: left;
+    list-style-type: none;
+}
+
+.custom-select {
+    color: black;
+}
