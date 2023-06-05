@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import ViewDetails from './ViewDetails';
 import ImportModel from './ImportModel';
-import Generate from './Generate';
+import Generation from './Generation';
+import Variation from './Variation';
 import UpdateAttributes from './UpdateAttributes';
 import PlayAudio from './PlayAudio';
 import './Tools.css';
@@ -17,7 +18,7 @@ function ToolBox() {
       <div className="tab-buttons">
         <button
           className={activeTool === 0 ? 'active' : ''}
-          onClick={() => setActiveTool('default')}
+          onClick={() => setActiveTool('none')}
         >
           Clear
         </button>
@@ -25,10 +26,11 @@ function ToolBox() {
       <hr />
       <div className="tab-content">
         {activeTool === 'importModel' && <ImportModel />}
-        {activeTool === 'generate' && <Generate />}
+        {activeTool === 'generation' && <Generation />}
+        {activeTool === 'variation' && <Variation />}
         {activeTool === 'details' && <ViewDetails />}
         {activeTool === 'updateAttributes' && <UpdateAttributes />}
-        {activeTool === 'playAudio' && <PlayAudio/>}
+        {activeTool === 'playAudio' && <PlayAudio />}
       </div>
     </div>
   );

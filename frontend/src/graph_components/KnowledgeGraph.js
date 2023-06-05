@@ -4,7 +4,7 @@ import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu'
 
 import ToolBox from '../tool_components/ToolBox';
-import defaultStyle from './GraphStyle';
+import defaultStyle from './Style';
 import defaultLayout from './Layout';
 
 cytoscape.use(fcose);
@@ -18,6 +18,7 @@ function KnowledgeGraph() {
 
     const [graphData, setGraphData] = useState(null);
     const [typeNames, setTypeNames] = useState(null);
+    const [modelNames, setModelNames] = useState(null);
 
     const [activeTool, setActiveTool] = useState('default')
     const [toolParams, setToolParams] = useState(null);
@@ -97,7 +98,7 @@ function KnowledgeGraph() {
                     {
                         content: 'Generate',
                         select: function (ele) {
-                            setActiveTool('generate');
+                            setActiveTool('generation');
 
                             const nodeData = ele.json().data;
                             setToolParams({ nodeData });
@@ -149,11 +150,42 @@ function KnowledgeGraph() {
                             const nodeData = ele.json().data;
                             setToolParams({ nodeData });
                         }
-                    }
+                    },
+
+                    {
+                        content: 'Variation',
+                        select: function (ele) {
+                            setActiveTool('variation');
+
+                            const nodeData = ele.json().data;
+                            setToolParams({ nodeData });
+                        }
+                    },
+                ]
+            });
+
+            // Edges
+            cy.cxtmenu({
+                selector: 'edge',
+                commands: [
+                    {
+                        content: 'Details',
+                        select: function (ele) {
+                            setActiveTool('details');
+
+                            const nodeData = ele.json().data;
+                            setToolParams({ nodeData });
+                        }
+                    },
                 ]
             });
 
             applyFcose();
+            
+            // Retrieve useful data
+            setModelNames(cy.elements('node[type="model"]').map((ele) => {
+                return ele.data('name');
+            }));
 
             return () => {
                 cy.destroy();
@@ -189,7 +221,7 @@ function KnowledgeGraph() {
     // -----------
 
     return (
-        <ToolContext.Provider value={{ typeNames, activeTool, setActiveTool, toolParams, setAwaitingResponse }}>
+        <ToolContext.Provider value={{ typeNames, modelNames, activeTool, setActiveTool, toolParams, setAwaitingResponse }}>
             <div className="main-content">
                 <div className="toolbar">
                     <h1>Test Graph</h1>

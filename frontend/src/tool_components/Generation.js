@@ -4,13 +4,11 @@ import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
-function Generate() {
+function Generation() {
     const defaultSampler = 'V_IPLMS';
     const defaultScheduler = 'V_CRASH';
 
     const { typeNames, toolParams, setAwaitingResponse } = useContext(ToolContext);
-    const [selectedSampler, setSelectedSampler] = useState({value: defaultSampler, label: defaultSampler});
-    const [selectedScheduler, setSelectedScheduler] = useState({value: defaultScheduler, label: defaultScheduler});
 
     const samplerOptions = typeNames.samplers.map((value) => ({
         value,
@@ -20,6 +18,8 @@ function Generate() {
         value,
         label: value
     }));
+    const [selectedSampler, setSelectedSampler] = useState({value: defaultSampler, label: defaultSampler});
+    const [selectedScheduler, setSelectedScheduler] = useState({value: defaultScheduler, label: defaultScheduler});
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -30,9 +30,6 @@ function Generate() {
         const formData = new FormData(form);
         formData.append('mode', 'Generation');
         formData.append('model_name', toolParams.nodeData.name);
-        formData.append('model_path', toolParams.nodeData.path);
-        formData.append('model_sample_rate', toolParams.nodeData.sample_rate);
-        formData.append('model_chunk_size', toolParams.nodeData.chunk_size);
         formData.append('sampler_type_name', selectedSampler.value);
         formData.append('scheduler_type_name', selectedScheduler.value);
 
@@ -55,7 +52,7 @@ function Generate() {
 
     return (
         <div>
-            <h2>Generate</h2>
+            <h2>Generation</h2>
             <form method="post" onSubmit={handleSubmit}>
                 Model: {toolParams.nodeData.name}
                 <hr />
@@ -108,4 +105,4 @@ function Generate() {
     );
 }
 
-export default Generate;
+export default Generation;

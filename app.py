@@ -2,11 +2,9 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 import torch
-import os
 from pathlib import Path
-import networkx as nx
 
-from util.util import load_audio, crop_audio
+from util.util import load_audio
 from util.platform import get_torch_device_type
 from dance_diffusion.api import RequestHandler, Request, RequestType, ModelType
 from diffusion_library.sampler import SamplerType
@@ -24,10 +22,12 @@ ARG_TYPES = {
     'created': int,
     
     # General inference
+    'sample_rate': int,
     'chunk_size': int,
     'batch_size': int,
     'steps': int,
     'seed': int,
+    'noise_level': float
 }
 
 app = Flask(__name__)
@@ -80,9 +80,9 @@ def import_model():
     if ddkg.import_model(
         name=request.form['model_name'],
         path=request.form['model_path'],
-        chunk_size=request.form['chunk_size'],
-        sample_rate=request.form['sample_rate'],
-        steps=request.form['steps'],
+        chunk_size=int(request.form['chunk_size']),
+        sample_rate=int(request.form['sample_rate']),
+        steps=int(request.form['steps']),
         copy=True
     ):
         message = 'Model imported successfully'
@@ -102,9 +102,14 @@ def import_model():
 def handle_sd_request():
     load_input = lambda source: load_audio(device_accelerator, request.form[source], request.form['model']) if source in request.form.keys() else None
 
+    model = ddkg.G.nodes[request.form['model_name']]
+
     sd_request = Request(
         request_type=RequestType[request.form['mode']],
         model_type=ModelType.DD,
+        model_path=model['path'],
+        model_chunk_size=int(request.form['chunk_size']),
+        model_sample_rate=model['sample_rate'],
 
         sampler_type=SamplerType[request.form['sampler_type_name']],
         sampler_args={'use_tqdm': True},

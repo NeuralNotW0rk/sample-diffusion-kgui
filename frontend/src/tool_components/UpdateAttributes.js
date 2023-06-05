@@ -1,10 +1,27 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import CreatableSelect from "react-select/creatable"
 import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
 function UpdateAttributes() {
+
     const { toolParams, setAwaitingResponse } = useContext(ToolContext);
+
+    const [alias, setAlias] = useState('');
+    const [caption, setCaption] = useState('');
+    const [selectedTags, setSelectedTags] = useState(null);
+    const [tagOptions, setTagOptions] = useState([]);
+
+    useEffect(() => {
+        setAlias(toolParams.nodeData.alias || '');
+        setCaption(toolParams.nodeData.caption || '');
+        setSelectedTags([]);
+        toolParams.nodeData.tags && setSelectedTags(toolParams.nodeData.tags.split(',').map((value) => ({
+            value,
+            label: value
+        })));
+    }, [toolParams]);
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -14,8 +31,11 @@ function UpdateAttributes() {
         const form = e.target;
         const formData = new FormData(form);
         formData.append('name', toolParams.nodeData.name);
+        
+        const tagLabels = selectedTags.map((element) => element.label)
+        tagLabels && formData.append('tags', tagLabels);
+
         formData.get('alias') === '' && formData.delete('alias');
-        formData.get('tags') === '' && formData.delete('tags');
         formData.get('caption') === '' && formData.delete('caption');
 
         setAwaitingResponse(true);
@@ -42,17 +62,31 @@ function UpdateAttributes() {
                 <hr />
                 <label>
                     Alias:
-                    <input name="alias" defaultValue={toolParams.nodeData.alias || ""} />
+                    <input
+                        name="alias"
+                        value={alias}
+                        onChange={(e) => setAlias(e.target.value)}
+                    />
                 </label>
                 <hr />
                 <label>
-                    Tags (comma separated):
-                    <input name="tags" defaultValue={toolParams.nodeData.tags || ""} />
+                    Tags:
+                    <CreatableSelect
+                        value={selectedTags}
+                        onChange={setSelectedTags}
+                        isMulti={true}
+                        isClearable={false}
+                        className="custom-select"
+                    />
                 </label>
                 <hr />
                 <label>
                     Caption:
-                    <input name="caption" defaultValue={toolParams.nodeData.caption || ""} />
+                    <input
+                        name="caption"
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                    />
                 </label>
                 <hr />
                 <button type="reset">Clear</button>

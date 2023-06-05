@@ -13,10 +13,10 @@ class RequestLogger(DDKnowledgeGraph):
 
     def log_request(self, request: Request, response: Response):
         if request.request_type == RequestType.Generation:
-            self.log_gen(
+            self.log_generation(
                 model_name=request.kwargs['model_name'],
                 sample_rate=request.model_sample_rate,
-                chunk_size=request.model_chunk_size,  # TODO: chunk_size or model_chunk_size?
+                chunk_size=request.model_chunk_size,
                 batch_size=request.kwargs['batch_size'],
                 seed=request.kwargs['seed'],
                 steps=request.kwargs['steps'],
