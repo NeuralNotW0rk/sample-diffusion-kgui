@@ -11,17 +11,8 @@ import torchaudio
 data_file = 'ddkg.json'
 model_dir = 'models'
 audio_dir = 'audio'
-gen_dir = 'generation'
-var_dir = 'variation'
 backups = 'backup'
 
-# TODO: Import from sample_diffusion maybe
-class RequestType(str, enum.Enum):
-    Generation = 'Generation'
-    Variation = 'Variation'
-    Interpolation = 'Interpolation'
-    Inpainting = 'Inpainting'
-    Extension = 'Extension'
 
 def check_dir(dir):
     if not os.path.exists(dir): os.makedirs(dir, exist_ok=True)
@@ -61,7 +52,6 @@ class DDKnowledgeGraph():
             sample_rate: int,
             steps: int,
             copy=False,
-            **kwargs
     ) -> bool:
         
         if copy:
@@ -87,22 +77,28 @@ class DDKnowledgeGraph():
         self.save()
         return True
 
-    def log_generation(
+    # Basic inference
+    def log_inference(
             self,
+            mode: str,
             model_name: str,
             sample_rate: int,
             chunk_size: int,
             batch_size: int,
             seed: int,
             steps: int,
-            scheduler: str,
-            sampler: str,
+            sampler_type_name: str,
+            scheduler_type_name: str,
             output: torch.Tensor,
+            audio_source_name: str=None,
+            noise_level: float=0.0,
             **kwargs
     ) -> bool:
         
-        # Create batch node and main edge
+        mode = mode.lower()
         current_time = int(time())
+
+        # Create batch node and main edge
         sample_prefix = f'{model_name}_{seed}_{current_time}'
         batch_name = f'batch_{sample_prefix}'
         self.G.add_node(
@@ -114,19 +110,28 @@ class DDKnowledgeGraph():
         self.G.add_edge(
             model_name,
             batch_name,
-            type='dd_generation',
+            type=f'dd_{mode}',
             model_name=model_name,
             chunk_size=chunk_size,
             batch_size=batch_size,
             seed=seed,
             steps=steps,
-            sampler=sampler,
-            scheduler=scheduler,
+            sampler=sampler_type_name,
+            scheduler=scheduler_type_name,
             created=current_time
         )
-        batch_dir = check_dir(self.root / audio_dir / gen_dir / model_name)
 
+        # Variation case
+        if mode == 'variation':
+            self.G.edges[model_name, batch_name]['noise_level'] = noise_level
+            self.G.add_edge(
+                audio_source_name,
+                batch_name,
+                type='audio_source'
+            )
+            
         # Create individual samples
+        batch_dir = check_dir(self.root / audio_dir / mode / model_name)
         for i, sample in enumerate(output):
             # Save audio
             audio_name = f'sample_{sample_prefix}_{i + 1}'
@@ -141,6 +146,7 @@ class DDKnowledgeGraph():
                 type='audio',
                 path=str(audio_path),
                 sample_rate=sample_rate,
+                chunk_size=chunk_size,
                 created=current_time
             )
             self.G.add_edge(
@@ -154,88 +160,8 @@ class DDKnowledgeGraph():
         self.save()
         return True
 
-    def log_variation(
-            self,
-            audio_source: str,
-            model_name: str,
-            sample_rate: int,
-            chunk_size: int,
-            batch_size: int,
-            seed: int,
-            steps: int,
-            scheduler: str,
-            sampler: str,
-            output: torch.Tensor,
-            **kwargs
-    ) -> bool:
-        
-        # Create batch node and main edge
-        current_time = int(time())
-        sample_prefix = f'{model_name}_{seed}_{current_time}'
-        batch_name = f'batch_{sample_prefix}'
-        self.G.add_node(
-            batch_name,
-            alias=batch_name[-10:],
-            type='batch',
-            created=current_time
-        )
-        self.G.add_edge(
-            model_name,
-            batch_name,
-            type='dd_variation',
-            model_name=model_name,
-            chunk_size=chunk_size,
-            batch_size=batch_size,
-            seed=seed,
-            steps=steps,
-            sampler=sampler,
-            scheduler=scheduler,
-            created=current_time
-        )
-        self.G.add_edge(
-            audio_source,
-            batch_name,
-            type='audio_source',
-            model_name=model_name,
-            chunk_size=chunk_size,
-            batch_size=batch_size,
-            seed=seed,
-            steps=steps,
-            sampler=sampler,
-            scheduler=scheduler,
-            created=current_time
-        )
-        batch_dir = check_dir(self.root / audio_dir / var_dir / model_name)
-
-        # Create individual samples
-        for i, sample in enumerate(output):
-            # Save audio
-            audio_name = f'sample_{sample_prefix}_{i + 1}'
-            audio_path = batch_dir / f'{audio_name}.wav'
-            open(str(audio_path), 'a').close()
-            torchaudio.save(str(audio_path), sample.cpu(), sample_rate)
-
-            # Create node
-            self.G.add_node(
-                audio_name,
-                alias=audio_name[-12:],
-                type='audio',
-                path=str(audio_path),
-                sample_rate=sample_rate,
-                created=current_time
-            )
-            self.G.add_edge(
-                audio_name,
-                batch_name,
-                type='batch_split',
-                created=current_time
-            )
-        
-        # Save on success
-        self.save()
-        return True
-
-    def update_element(
+    # Simple element attribute update
+    def update_node(
             self,
             name: str,
             attrs: dict

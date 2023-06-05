@@ -9,7 +9,7 @@ function Variation() {
     const defaultScheduler = 'V_CRASH';
 
     const { typeNames, modelNames, toolParams, setAwaitingResponse } = useContext(ToolContext);
-    const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size);
+    const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size || '65536');
 
     const modelOptions = modelNames.map((value) => ({
         value,
@@ -35,7 +35,7 @@ function Variation() {
         const form = e.target;
         const formData = new FormData(form);
         formData.append('mode', 'Variation');
-        formData.append('audio_source', toolParams.nodeData.name)
+        formData.append('audio_source_name', toolParams.nodeData.name)
         formData.append('model_name', selectedModel.value);
         formData.append('sampler_type_name', selectedSampler.value);
         formData.append('scheduler_type_name', selectedScheduler.value);
@@ -101,8 +101,8 @@ function Variation() {
                 </label>
                 <hr />
                 <label>
-                    Step count:
-                    <input name="noise_level" type="number" defaultValue="50" />
+                    Noise level:
+                    <input name="noise_level" type="number" defaultValue="0.7" />
                 </label>
                 <hr />
                 <label>

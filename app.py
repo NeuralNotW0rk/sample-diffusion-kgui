@@ -10,17 +10,12 @@ from dance_diffusion.api import RequestHandler, Request, RequestType, ModelType
 from diffusion_library.sampler import SamplerType
 from diffusion_library.scheduler import SchedulerType
 
-from request_logger import RequestLogger
+from ddkg import DDKnowledgeGraph
 
 DEFAULT_PATH = './data'
 DEFAULT_SD_REPO = '../sample-diffusion'
 
 ARG_TYPES = {
-    # Model params
-    'model_sample_rate': int,
-    'model_chunk_size': int,
-    'created': int,
-    
     # General inference
     'sample_rate': int,
     'chunk_size': int,
@@ -39,7 +34,7 @@ device_accelerator = torch.device(device_type_accelerator)
 use_autocast = True  # TODO: Make configurable
 
 request_handler = RequestHandler(device_accelerator, optimize_memory_use=False, use_autocast=True)
-ddkg = RequestLogger(DEFAULT_PATH)
+ddkg = DDKnowledgeGraph(DEFAULT_PATH)
 
 
 # ---------------
@@ -100,35 +95,47 @@ def import_model():
 # Handles basic sample-diffusion requests with minimal interference
 @app.route('/sd-request', methods=['POST'])
 def handle_sd_request():
-    load_input = lambda source: load_audio(device_accelerator, request.form[source], request.form['model']) if source in request.form.keys() else None
+    # Cast args
+    args = {k : ARG_TYPES[k](v) if k in ARG_TYPES else v for k, v in request.form.items()}
 
-    model = ddkg.G.nodes[request.form['model_name']]
+    model_node = ddkg.G.nodes[args['model_name']]
+    args['model_path'] = model_node['path']
+    args['sample_rate'] = model_node['sample_rate']
 
+    audio_source = None
+    if 'audio_source_name' in args:
+        audio_node = ddkg.G.nodes[args['audio_source_name']]
+        audio_source = load_audio(device_accelerator, audio_node['path'], audio_node['sample_rate'])
+    else:
+        args['audio_source_name'] = None
+
+    # Construct sample diffusion request
     sd_request = Request(
-        request_type=RequestType[request.form['mode']],
+        request_type=RequestType[args['mode']],
         model_type=ModelType.DD,
-        model_path=model['path'],
-        model_chunk_size=int(request.form['chunk_size']),
-        model_sample_rate=model['sample_rate'],
+        model_chunk_size=args['chunk_size'],
+        model_sample_rate=args['sample_rate'],
 
-        sampler_type=SamplerType[request.form['sampler_type_name']],
+        sampler_type=SamplerType[args['sampler_type_name']],
         sampler_args={'use_tqdm': True},
 
-        scheduler_type=SchedulerType[request.form['scheduler_type_name']],
+        scheduler_type=SchedulerType[args['scheduler_type_name']],
         scheduler_args={
             'sigma_min': 0.1,  # TODO: make configurable
             'sigma_max': 50.0,  # TODO: make configurable
             'rho': 1.0  # TODO: make configurable
         },
 
-        audio_source=load_input('audio_source_path'),
-        audio_target=load_input('audio_target_path'),
-
-        **{k : ARG_TYPES[k](v) if k in ARG_TYPES else v for k, v in request.form.items()}
+        audio_source=audio_source,
+        **args
     )
 
-    response = request_handler.process_request(sd_request)
-    ddkg.log_request(sd_request, response)
+    # Get response, then log to ddkg
+    output = request_handler.process_request(sd_request).result
+    ddkg.log_inference(
+        output=output,
+        **args
+    )
   
     return jsonify({'message': 'success'})
 
