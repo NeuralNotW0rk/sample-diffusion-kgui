@@ -1,14 +1,17 @@
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import cytoscape, { use } from 'cytoscape';
 import fcose from 'cytoscape-fcose';
-import cxtmenu from 'cytoscape-cxtmenu'
+import cxtmenu from 'cytoscape-cxtmenu';
+import expandCollapse from 'cytoscape-expand-collapse';
 
 import ToolBox from '../tool_components/ToolBox';
 import defaultStyle from './Style';
 import defaultLayout from './Layout';
+import defaultOptions from './Options';
 
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
+cytoscape.use(expandCollapse);
 
 const ToolContext = createContext();
 
@@ -69,14 +72,24 @@ function KnowledgeGraph() {
             });
             cytoscapeInstanceRef.current = cy;
 
-            // Context menu configuration
+            // Expand and collapse setup
+            const api = cy.expandCollapse(defaultOptions);
+            cy.$('node[type="batch"]').data('isExpanded', true);
+            cy.nodes().on('expandcollapse.beforecollapse', function(e) {
+                var node = this;
+                node.data('isExpanded', false);
+            });
+            cy.nodes().on('expandcollapse.beforeexpand', function(e) {
+                var node = this;
+                node.data('isExpanded', true);
+            });
 
             // Core component
             cy.cxtmenu({
                 selector: 'core',
                 commands: [
                     {
-                        content: 'Recenter view',
+                        content: 'Shuffle',
                         select: function () {
                             applyFcose();
                         }
@@ -116,6 +129,23 @@ function KnowledgeGraph() {
                     }
                 ]
             });
+
+            // Batch nodes
+            cy.cxtmenu({
+                selector: 'node[type="batch"][?isExpanded]',
+                commands: [
+                    {
+                        content: 'Details',
+                        select: function (ele) {
+                            setActiveTool('details');
+
+                            const nodeData = ele.json().data;
+                            setToolParams({ nodeData });
+                        }
+                    }
+                ]
+            });
+
 
             // Audio nodes
             cy.cxtmenu({

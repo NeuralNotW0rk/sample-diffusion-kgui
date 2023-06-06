@@ -41,7 +41,7 @@ const defaultLayout = {
     /* incremental layout options */
     
     // Node repulsion (non overlapping) multiplier
-    nodeRepulsion: node => 8000,
+    nodeRepulsion: node => 4500,
     // Ideal edge (non nested) length
     idealEdgeLength: edge => 50,
     // Divisor to compute edge forces

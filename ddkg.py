@@ -147,14 +147,17 @@ class DDKnowledgeGraph():
                 path=str(audio_path),
                 sample_rate=sample_rate,
                 chunk_size=chunk_size,
-                created=current_time
+                created=current_time,
+                parent=batch_name
             )
+            '''
             self.G.add_edge(
                 audio_name,
                 batch_name,
                 type='batch_split',
                 created=current_time
             )
+            '''
         
         # Save on success
         self.save()
