@@ -13,7 +13,7 @@ function PlayAudio() {
     }, [toolParams])
 
     function initSound() {
-        const url = `http://localhost:5000/audio?name=${toolParams.nodeData.name}`;
+        const url = `/audio?name=${toolParams.nodeData.name}`;
         fetch(url)
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))

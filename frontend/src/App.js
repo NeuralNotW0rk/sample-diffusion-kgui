@@ -8,7 +8,7 @@ function App() {
     <div className="app-container">
       <header className='header'>
         <h1> Dance Diffusion KGUI </h1>
-      </header>
+      </header> 
       <KnowledgeGraph />
     </div>
   );

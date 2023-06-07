@@ -8,7 +8,7 @@ function Generation() {
     const defaultSampler = 'V_IPLMS';
     const defaultScheduler = 'V_CRASH';
 
-    const { typeNames, toolParams, setAwaitingResponse } = useContext(ToolContext);
+    const { typeNames, toolParams, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
     const samplerOptions = typeNames.samplers.map((value) => ({
         value,
@@ -34,13 +34,14 @@ function Generation() {
         formData.append('scheduler_type_name', selectedScheduler.value);
 
         setAwaitingResponse(true);
-        fetch('http://localhost:5000/sd-request', {
+        fetch('/sd-request', {
             method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
                 setAwaitingResponse(false);
+                setPendingRefresh(true);
                 console.log(data.message); // Success message from the server
             })
             .catch(error => {

@@ -39,7 +39,7 @@ function UpdateAttributes() {
         formData.get('caption') === '' && formData.delete('caption');
 
         setAwaitingResponse(true);
-        fetch('http://localhost:5000/update-element', {
+        fetch('/update-element', {
             method: 'POST',
             body: formData
         })

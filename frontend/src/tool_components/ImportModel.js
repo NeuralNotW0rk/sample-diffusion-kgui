@@ -16,7 +16,7 @@ function ImportModel() {
         const formData = new FormData(form);
 
         setAwaitingResponse(true);
-        fetch('http://localhost:5000/import-model', {
+        fetch('/import-model', {
                 method: 'POST',
                 body: formData
             })

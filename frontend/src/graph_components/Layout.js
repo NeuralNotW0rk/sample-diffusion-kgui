@@ -7,7 +7,7 @@ const defaultLayout = {
     quality: "default",
     // Use random node positions at beginning of layout
     // if this is set to false, then quality option must be "proof"
-    randomize: true, 
+    randomize: false, 
     // Whether or not to animate the layout
     animate: true, 
     // Duration of animation in ms, if enabled
@@ -51,7 +51,7 @@ const defaultLayout = {
     // Maximum number of iterations to perform - this is a suggested value and might be adjusted by the algorithm as required
     numIter: 2500,
     // For enabling tiling
-    tile: true,
+    tile: false,
     // The comparison function to be used while sorting nodes during tiling operation.
     // Takes the ids of 2 nodes that will be compared as a parameter and the default tiling operation is performed when this option is not set.
     // It works similar to ``compareFunction`` parameter of ``Array.prototype.sort()``
@@ -66,7 +66,7 @@ const defaultLayout = {
     // Gravity force (constant)
     gravity: 0.25,
     // Gravity range (constant) for compounds
-    gravityRangeCompound: 1.5,
+    gravityRangeCompound: 0.5,
     // Gravity force (constant) for compounds
     gravityCompound: 1.0,
     // Gravity range (constant)

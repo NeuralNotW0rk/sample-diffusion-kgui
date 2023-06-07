@@ -26,6 +26,7 @@ function KnowledgeGraph() {
     const [activeTool, setActiveTool] = useState('default')
     const [toolParams, setToolParams] = useState(null);
     const [awaitingResponse, setAwaitingResponse] = useState(false);
+    const [pendingRefresh, setPendingRefresh] = useState(true);
 
     // -----------------
     //  COMPONENT SETUP
@@ -34,7 +35,7 @@ function KnowledgeGraph() {
     // Load graph from server
     const fetchGraphData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/graph');
+            const response = await fetch('/graph');
             const data = await response.json();
             setGraphData(data);
         } catch (error) {
@@ -44,7 +45,7 @@ function KnowledgeGraph() {
 
     const fetchTypeNames = async () => {
         try {
-            const response = await fetch('http://localhost:5000/sd-types');
+            const response = await fetch('/sd-types');
             const data = await response.json();
             setTypeNames(data);
         } catch (error) {
@@ -52,174 +53,183 @@ function KnowledgeGraph() {
         }
     };
 
-    // Initialize graph data and type names
+    // Initialize graph
     useEffect(() => {
-        setAwaitingResponse(true);
-        fetchGraphData();
+        // Initialize Cytoscape.js instance and attach it to the container
+        const cy = cytoscape({
+            container: cytoscapeContainerRef.current,
+            style: defaultStyle,
+        });
+        cytoscapeInstanceRef.current = cy;
+
+        cy.expandCollapse(defaultOptions);
+
+        cy.nodes().on('expandcollapse.beforecollapse', function() {
+            var node = this;
+            node.data('isExpanded', false);
+        });
+        cy.nodes().on('expandcollapse.beforeexpand', function() {
+            var node = this;
+            node.data('isExpanded', true);
+        });
+
+
+        // Core component
+        cy.cxtmenu({
+            selector: 'core',
+            commands: [
+                {
+                    content: 'Shuffle',
+                    select: function () {
+                        applyFcose(true);
+                    }
+                },
+
+                {
+                    content: 'Import Model',
+                    select: function () {
+                        setActiveTool('importModel');
+                    }
+                },
+            ]
+        });
+
+        // Model nodes
+        cy.cxtmenu({
+            selector: 'node[type="model"]',
+            commands: [
+                {
+                    content: 'Generate',
+                    select: function (ele) {
+                        setActiveTool('generation');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                }
+            ]
+        });
+
+        // Batch nodes
+        cy.cxtmenu({
+            selector: 'node[type="batch"][?isExpanded]',
+            commands: [
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                }
+            ]
+        });
+
+
+        // Audio nodes
+        cy.cxtmenu({
+            selector: 'node[type="audio"]',
+            commands: [
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+
+                {
+                    content: 'Play',
+                    select: function (ele) {
+                        setActiveTool('playAudio');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+
+
+                {
+                    content: 'Edit',
+                    select: function (ele) {
+                        setActiveTool('updateAttributes');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+
+                {
+                    content: 'Variation',
+                    select: function (ele) {
+                        setActiveTool('variation');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+            ]
+        });
+
+        // Edges
+        cy.cxtmenu({
+            selector: 'edge',
+            commands: [
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+            ]
+        });
+
         fetchTypeNames();
-        setAwaitingResponse(false);
+
+        return () => {
+            cy.destroy();
+        };
     }, []);
 
-    // Initialize graph on data retreival
+    // Initialize graph data
+    useEffect(() => {
+        if (pendingRefresh) {
+            fetchGraphData();
+            setPendingRefresh(false);
+        }
+    }, [pendingRefresh]);
+
+    // Update graph
     useEffect(() => {
         if (graphData) {
-            // Initialize Cytoscape.js instance and attach it to the container
-            const cy = cytoscape({
-                container: cytoscapeContainerRef.current,
-                elements: graphData.elements,
-                style: defaultStyle,
-                layout: defaultLayout
-            });
-            cytoscapeInstanceRef.current = cy;
+            const cy = cytoscapeInstanceRef.current;
+            cy.add(graphData.elements);
 
             // Expand and collapse setup
-            const api = cy.expandCollapse(defaultOptions);
             cy.$('node[type="batch"]').data('isExpanded', true);
-            cy.nodes().on('expandcollapse.beforecollapse', function(e) {
-                var node = this;
-                node.data('isExpanded', false);
-            });
-            cy.nodes().on('expandcollapse.beforeexpand', function(e) {
-                var node = this;
-                node.data('isExpanded', true);
-            });
 
-            // Core component
-            cy.cxtmenu({
-                selector: 'core',
-                commands: [
-                    {
-                        content: 'Shuffle',
-                        select: function () {
-                            applyFcose();
-                        }
-                    },
-
-                    {
-                        content: 'Import Model',
-                        select: function () {
-                            setActiveTool('importModel');
-                        }
-                    },
-                ]
-            });
-
-            // Model nodes
-            cy.cxtmenu({
-                selector: 'node[type="model"]',
-                commands: [
-                    {
-                        content: 'Generate',
-                        select: function (ele) {
-                            setActiveTool('generation');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-
-                    {
-                        content: 'Details',
-                        select: function (ele) {
-                            setActiveTool('details');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    }
-                ]
-            });
-
-            // Batch nodes
-            cy.cxtmenu({
-                selector: 'node[type="batch"][?isExpanded]',
-                commands: [
-                    {
-                        content: 'Details',
-                        select: function (ele) {
-                            setActiveTool('details');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    }
-                ]
-            });
-
-
-            // Audio nodes
-            cy.cxtmenu({
-                selector: 'node[type="audio"]',
-                commands: [
-                    {
-                        content: 'Details',
-                        select: function (ele) {
-                            setActiveTool('details');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-
-                    {
-                        content: 'Play',
-                        select: function (ele) {
-                            setActiveTool('playAudio');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-
-
-                    {
-                        content: 'Edit',
-                        select: function (ele) {
-                            setActiveTool('updateAttributes');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-
-                    {
-                        content: 'Variation',
-                        select: function (ele) {
-                            setActiveTool('variation');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-                ]
-            });
-
-            // Edges
-            cy.cxtmenu({
-                selector: 'edge',
-                commands: [
-                    {
-                        content: 'Details',
-                        select: function (ele) {
-                            setActiveTool('details');
-
-                            const nodeData = ele.json().data;
-                            setToolParams({ nodeData });
-                        }
-                    },
-                ]
-            });
-
-            applyFcose();
-            
             // Retrieve useful data
             setModelNames(cy.elements('node[type="model"]').map((ele) => {
                 return ele.data('name');
             }));
 
-            return () => {
-                cy.destroy();
-            };
+            applyFcose();
         }
     }, [graphData]);
 
@@ -227,21 +237,9 @@ function KnowledgeGraph() {
     //  LAYOUT FUNCTIONS
     // ------------------
 
-    const randomizeGraph = () => {
+    function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
-        // Update the graph to randomize it
-        var layout = cy.layout({
-            name: 'random',
-            animate: true,
-            animationDuration: 1000
-        });
-
-        layout.run();
-    };
-
-    const applyFcose = () => {
-        const cy = cytoscapeInstanceRef.current;
-        var layout = cy.layout(defaultLayout);
+        var layout = cy.layout({...defaultLayout, randomize});
 
         layout.run();
     };
@@ -251,7 +249,14 @@ function KnowledgeGraph() {
     // -----------
 
     return (
-        <ToolContext.Provider value={{ typeNames, modelNames, activeTool, setActiveTool, toolParams, setAwaitingResponse }}>
+        <ToolContext.Provider value={{
+            typeNames,
+            modelNames,
+            toolParams,
+            setActiveTool,
+            setAwaitingResponse,
+            setPendingRefresh
+        }}>
             <div className="main-content">
                 <div className="toolbar">
                     <h1>Test Graph</h1>
@@ -261,7 +266,7 @@ function KnowledgeGraph() {
                             <h2>Waiting for response...</h2>
                         </div>
                     ) : (
-                        <ToolBox />
+                        <ToolBox activeTool={activeTool}/>
                     )}
                 </div>
                 <div ref={cytoscapeContainerRef} style={{ width: '80%', height: '100%', textAlign: 'left' }} />

@@ -1,8 +1,6 @@
 const audioColor = '#267' // Darkish blue
 const modelColor = '#627' // Purple
-const batchColor = '#000'
-const generationColor = ''
-const variationColor = ''
+const batchColor = '#000' // Black
 
 const defaultStyle = [
     // General style configuration
@@ -33,7 +31,7 @@ const defaultStyle = [
         }
     },
     {
-        selector: 'node[type="batch"][?isExpanded]',
+        selector: 'node[type="batch"]',
         style: {
             'label': 'data(alias)',
             'text-valign': 'top',
@@ -41,18 +39,6 @@ const defaultStyle = [
             'background-opacity': 0.50,
             'border-color': audioColor,
             'border-width': 2,
-        }
-    },
-    {
-        selector: 'node[type="batch"][!isExpanded]',
-        style: {
-            'label': 'data(alias)',
-            'background-color': batchColor,
-            'background-opacity': 0.50,
-            'border-color': audioColor,
-            'border-width': 2,
-            'width': 30,
-            'height': 30,
         }
     },
     {
@@ -71,14 +57,14 @@ const defaultStyle = [
         style: {
             'line-color': modelColor,
             'target-arrow-color': modelColor,
-            'line-style': 'dashed'
         }
     },
     {
         selector: 'edge[type="dd_variation"]',
         style: {
             'line-color': modelColor,
-            'target-arrow-color': modelColor
+            'target-arrow-color': modelColor,
+            'line-style': 'dashed',
         }
     },
     {

@@ -9,9 +9,9 @@ import './Tools.css';
 
 import { ToolContext } from '../graph_components/KnowledgeGraph';
 
-function ToolBox() {
+function ToolBox({activeTool}) {
 
-  const { activeTool, setActiveTool } = useContext(ToolContext);
+  const { setActiveTool } = useContext(ToolContext);
 
   return (
     <div className="toolbox-component">

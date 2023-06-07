@@ -164,10 +164,12 @@ class DDKnowledgeGraph():
         return True
 
     # Simple element attribute update
-    def update_node(
+    def update_element(
             self,
             name: str,
             attrs: dict
     ):
         nx.function.set_node_attributes(self.G, {name: attrs})
         self.save()
+
+        # TODO: Handle non-node elements
