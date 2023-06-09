@@ -104,12 +104,14 @@ class DDKnowledgeGraph():
         self.G.add_node(
             batch_name,
             alias=batch_name[-10:],
+            id=hash(batch_name),
             type='batch',
             created=current_time
         )
         self.G.add_edge(
             model_name,
             batch_name,
+            id=hash(model_name + batch_name),
             type=f'dd_{mode}',
             model_name=model_name,
             chunk_size=chunk_size,
@@ -127,6 +129,7 @@ class DDKnowledgeGraph():
             self.G.add_edge(
                 audio_source_name,
                 batch_name,
+                id=hash(audio_source_name + batch_name),
                 type='audio_source'
             )
             
@@ -134,7 +137,8 @@ class DDKnowledgeGraph():
         batch_dir = check_dir(self.root / audio_dir / mode / model_name)
         for i, sample in enumerate(output):
             # Save audio
-            audio_name = f'sample_{sample_prefix}_{i + 1}'
+            batch_idx = i + 1
+            audio_name = f'sample_{sample_prefix}_{batch_idx}'
             audio_path = batch_dir / f'{audio_name}.wav'
             open(str(audio_path), 'a').close()
             torchaudio.save(str(audio_path), sample.cpu(), sample_rate)
@@ -143,6 +147,8 @@ class DDKnowledgeGraph():
             self.G.add_node(
                 audio_name,
                 alias=audio_name[-12:],
+                id=hash(audio_name) + batch_idx,
+                batch_index=batch_idx,
                 type='audio',
                 path=str(audio_path),
                 sample_rate=sample_rate,

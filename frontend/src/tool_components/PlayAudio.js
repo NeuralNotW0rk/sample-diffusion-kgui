@@ -5,7 +5,7 @@ import { ToolContext } from "../graph_components/KnowledgeGraph";
 
 
 function PlayAudio() {
-    const { toolParams, setAwaitingResponse } = useContext(ToolContext);
+    const { toolParams } = useContext(ToolContext);
     const audioContext = new AudioContext({ latencyHint: 'playback' })
 
     useEffect(() => {

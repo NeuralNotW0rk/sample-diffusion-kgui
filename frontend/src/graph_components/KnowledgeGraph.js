@@ -22,6 +22,7 @@ function KnowledgeGraph() {
     const [graphData, setGraphData] = useState(null);
     const [typeNames, setTypeNames] = useState(null);
     const [modelNames, setModelNames] = useState(null);
+    const [tagList, setTagList] = useState(null);
 
     const [activeTool, setActiveTool] = useState('default')
     const [toolParams, setToolParams] = useState(null);
@@ -219,17 +220,55 @@ function KnowledgeGraph() {
     useEffect(() => {
         if (graphData) {
             const cy = cytoscapeInstanceRef.current;
+
+            // Replace elements and restore positions
+            const positions = cy.nodes().map((ele) => {
+                return {id: ele.id(), pos: ele.position()};   
+            });
+
+            cy.remove('*');
             cy.add(graphData.elements);
+
+            positions.forEach((ele) => {
+                cy.$id(ele.id).position(ele.pos);
+            });
+
+            // Apply layout if number of nodes has changed
+            cy.nodes().length === positions.length || applyFcose();
+            
 
             // Expand and collapse setup
             cy.$('node[type="batch"]').data('isExpanded', true);
 
-            // Retrieve useful data
+            // Retrieve model names
             setModelNames(cy.elements('node[type="model"]').map((ele) => {
                 return ele.data('name');
             }));
 
-            applyFcose();
+            // Create a list of existing tags sorted by frequency
+            var tagCounts = {};
+            cy.elements().forEach((ele) => {
+                if (ele.data('tags')) {
+                    ele.data('tags').split(',').forEach((tag) => {
+                        if (tagCounts[tag]) {
+                            tagCounts[tag] += 1;
+                        } else {
+                            tagCounts[tag] = 1;
+                        }
+                    })
+                }
+            })
+            var tagListTemp = Object.entries(tagCounts).map(([tag, count]) => ({
+                tag,
+                count
+            }));
+            tagListTemp.sort((a, b) => b.count - a.count);
+            setTagList(tagListTemp);
+
+            // Signal active tool to update
+            const nodeData = cy.$id(toolParams.nodeData.id).json().data;
+            setToolParams({ nodeData });
+            
         }
     }, [graphData]);
 
@@ -252,6 +291,7 @@ function KnowledgeGraph() {
         <ToolContext.Provider value={{
             typeNames,
             modelNames,
+            tagList,
             toolParams,
             setActiveTool,
             setAwaitingResponse,

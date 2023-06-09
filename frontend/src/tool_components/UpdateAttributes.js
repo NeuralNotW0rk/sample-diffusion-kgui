@@ -6,12 +6,12 @@ import { ToolContext } from "../graph_components/KnowledgeGraph";
 
 function UpdateAttributes() {
 
-    const { toolParams, setAwaitingResponse } = useContext(ToolContext);
+    const { toolParams, tagList, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
     const [alias, setAlias] = useState('');
     const [caption, setCaption] = useState('');
     const [selectedTags, setSelectedTags] = useState(null);
-    const [tagOptions, setTagOptions] = useState([]);
+    const [tagOptions, setTagOptions] = useState(null);
 
     useEffect(() => {
         setAlias(toolParams.nodeData.alias || '');
@@ -20,6 +20,10 @@ function UpdateAttributes() {
         toolParams.nodeData.tags && setSelectedTags(toolParams.nodeData.tags.split(',').map((value) => ({
             value,
             label: value
+        })));
+        setTagOptions(tagList.map((value) => ({
+            value: value.tag,
+            label: value.tag
         })));
     }, [toolParams]);
 
@@ -38,6 +42,7 @@ function UpdateAttributes() {
         formData.get('alias') === '' && formData.delete('alias');
         formData.get('caption') === '' && formData.delete('caption');
 
+
         setAwaitingResponse(true);
         fetch('/update-element', {
             method: 'POST',
@@ -45,12 +50,13 @@ function UpdateAttributes() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message); // Success message from the server
                 setAwaitingResponse(false);
+                setPendingRefresh(true);
+                console.log(data.message); // Success message from the server
             })
             .catch(error => {
-                console.error('Error:', error);
                 setAwaitingResponse(false);
+                console.error('Error:', error);
             });
     };
 
@@ -74,6 +80,7 @@ function UpdateAttributes() {
                     <CreatableSelect
                         value={selectedTags}
                         onChange={setSelectedTags}
+                        options={tagOptions}
                         isMulti={true}
                         isClearable={false}
                         className="custom-select"
