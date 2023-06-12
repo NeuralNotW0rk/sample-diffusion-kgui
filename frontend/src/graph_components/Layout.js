@@ -51,7 +51,7 @@ const defaultLayout = {
     // Maximum number of iterations to perform - this is a suggested value and might be adjusted by the algorithm as required
     numIter: 2500,
     // For enabling tiling
-    tile: false,
+    tile: true,
     // The comparison function to be used while sorting nodes during tiling operation.
     // Takes the ids of 2 nodes that will be compared as a parameter and the default tiling operation is performed when this option is not set.
     // It works similar to ``compareFunction`` parameter of ``Array.prototype.sort()``

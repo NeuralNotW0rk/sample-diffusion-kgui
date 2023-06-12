@@ -87,9 +87,16 @@ function KnowledgeGraph() {
                 },
 
                 {
-                    content: 'Import Model',
+                    content: 'Import model',
                     select: function () {
                         setActiveTool('importModel');
+                    }
+                },
+
+                {
+                    content: 'Add external source',
+                    select: function () {
+                        setActiveTool('externalSource');
                     }
                 },
             ]
@@ -266,8 +273,10 @@ function KnowledgeGraph() {
             setTagList(tagListTemp);
 
             // Signal active tool to update
-            const nodeData = cy.$id(toolParams.nodeData.id).json().data;
-            setToolParams({ nodeData });
+            if (toolParams) {
+                const nodeData = cy.$id(toolParams.nodeData.id).json().data;
+                setToolParams({ nodeData });
+            };
             
         }
     }, [graphData]);

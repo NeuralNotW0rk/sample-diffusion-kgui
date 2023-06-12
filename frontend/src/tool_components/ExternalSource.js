@@ -3,7 +3,7 @@ import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
 
-function ImportModel() {
+function ExternalSource() {
 
     const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
@@ -16,7 +16,7 @@ function ImportModel() {
         const formData = new FormData(form);
 
         setAwaitingResponse(true);
-        fetch('/import-model', {
+        fetch('/add-external-source', {
                 method: 'POST',
                 body: formData
             })
@@ -36,31 +36,16 @@ function ImportModel() {
 
     return (
         <div>
-            <h2> Import Model </h2>
+            <h2> External Source </h2>
             <form method="post" onSubmit={handleSubmit}>
                 <label>
-                    Model name:
-                    <input name="model_name" defaultValue="" />
+                    Source name:
+                    <input name="source_name" defaultValue="" />
                 </label>
                 <hr />
                 <label>
-                    Model path:
-                    <input name="model_path" defaultValue="" />
-                </label>
-                <hr />
-                <label>
-                    Chunk size:
-                    <input name="chunk_size" type="number" defaultValue="65536" />
-                </label>
-                <hr />
-                <label>
-                    Sample rate:
-                    <input name="sample_rate" type="number" defaultValue="44100" />
-                </label>
-                <hr />
-                <label>
-                    Training steps:
-                    <input name="steps" type="number" defaultValue="0" />
+                    Source path:
+                    <input name="source_root" defaultValue="" />
                 </label>
                 <hr />
                 <button type="reset">Reset form</button>
@@ -70,4 +55,4 @@ function ImportModel() {
       );
 };
 
-export default ImportModel;
+export default ExternalSource;

@@ -86,6 +86,18 @@ def import_model():
     
     return jsonify({'message': message})
 
+# Copies a model to the ddkg dir
+@app.route('/add-external-source', methods=['POST'])
+def add_source():
+    ddkg.add_external_source(
+        request.form['source_name'],
+        request.form['source_root']
+    )
+    ddkg.scan_external_source(
+        request.form['source_name']
+    )
+    return jsonify({'message': 'success'})
+
 
 # -----------------
 #  Model Inference

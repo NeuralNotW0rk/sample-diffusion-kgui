@@ -1,6 +1,9 @@
-const audioColor = '#267' // Darkish blue
-const modelColor = '#627' // Purple
+const audioColor = '#278' // Pale cyan
+const modelColor = '#527' // Purple
 const batchColor = '#000' // Black
+const externalColor = '#14a' // Blue
+const selectedColor = '#888' // Light gray
+const unassignedColor1 = '#914' // Maroon?
 
 const defaultStyle = [
     // General style configuration
@@ -31,7 +34,16 @@ const defaultStyle = [
         }
     },
     {
-        selector: 'node[type="batch"]',
+        selector: 'node[type="external"]',
+        style: {
+            'label': 'data(name)',
+            'background-color': externalColor,
+            'width': 60,
+            'height': 60,
+        }
+    },
+    {
+        selector: 'node[type="batch"], node[type="set"]',
         style: {
             'label': 'data(alias)',
             'text-valign': 'top',
@@ -74,6 +86,24 @@ const defaultStyle = [
             'target-arrow-color': audioColor,
             'line-style': 'dashed',
         }
+    },
+    {
+        selector: 'edge[type="import"]',
+        style: {
+            'line-color': externalColor,
+            'target-arrow-color': externalColor,
+        }
+    },
+
+    // Overrides
+    {
+        selector: ':selected',
+        style: {
+            'border-color': selectedColor,
+            'border-width': 4,
+            'line-color': selectedColor,
+            'target-arrow-color': selectedColor,
+        },
     },
 ]
 
