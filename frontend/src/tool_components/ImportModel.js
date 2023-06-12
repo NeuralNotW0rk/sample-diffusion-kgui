@@ -23,7 +23,7 @@ function ImportModel() {
             .then(response => response.json())
             .then(data => {
                 setAwaitingResponse(false);
-                setPendingRefresh(true);
+                setPendingRefresh(true)
                 console.log(data.message); // Success message from the server
             })
             .catch(error => {

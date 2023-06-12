@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import Select from 'react-select';
+import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, Box, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
 import { ToolContext } from "../graph_components/KnowledgeGraph";
@@ -10,28 +10,18 @@ function Generation() {
 
     const { typeNames, toolParams, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
-    const samplerOptions = typeNames.samplers.map((value) => ({
-        value,
-        label: value
-    }));
-    const schedulerOptions = typeNames.schedulers.map((value) => ({
-        value,
-        label: value
-    }));
-    const [selectedSampler, setSelectedSampler] = useState({value: defaultSampler, label: defaultSampler});
-    const [selectedScheduler, setSelectedScheduler] = useState({value: defaultScheduler, label: defaultScheduler});
+    const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
+    const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
 
     function handleSubmit(e) {
-        // Prevent the browser from reloading the page
         e.preventDefault();
 
-        // Read the form data
         const form = e.target;
         const formData = new FormData(form);
         formData.append('mode', 'Generation');
-        formData.append('model_name', toolParams.nodeData.name);
-        formData.append('sampler_type_name', selectedSampler.value);
-        formData.append('scheduler_type_name', selectedScheduler.value);
+        formData.append('model_name', toolParams.nodeData.name)
+        formData.append('sampler_type_name', selectedSampler);
+        formData.append('scheduler_type_name', selectedScheduler);
 
         setAwaitingResponse(true);
         fetch('/sd-request', {
@@ -42,7 +32,7 @@ function Generation() {
             .then(data => {
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
-                console.log(data.message); // Success message from the server
+                console.log(data.message);
             })
             .catch(error => {
                 setAwaitingResponse(false);
@@ -50,59 +40,72 @@ function Generation() {
             });
     };
 
-
     return (
-        <div>
-            <h2>Generation</h2>
-            <form method="post" onSubmit={handleSubmit}>
-                Model: {toolParams.nodeData.name}
-                <hr />
-                Sample rate: {toolParams.nodeData.sample_rate}
-                <hr />
-                <label>
-                    Chunk size:
-                    <input name="chunk_size" type="number" defaultValue={toolParams.nodeData.chunk_size} />
-                </label>
-                <hr />
-                <label>
-                    Batch size:
-                    <input name="batch_size" type="number" defaultValue="1" />
-                </label>
-                <hr />
-                <label>
-                    Seed:
-                    <input name="seed" type="number" defaultValue="0" />
-                </label>
-                <hr />
-                <label>
-                    Step count:
-                    <input name="steps" type="number" defaultValue="50" />
-                </label>
-                <hr />
-                <label>
-                    Sampler:
+        <Box>
+            <Typography variant="h3">Generation</Typography>
+            <Stack
+            component="form"
+            method="post"
+            onSubmit={handleSubmit}
+            spacing={2}
+            alignItems="center">
+                <Typography variant="body1">Model: {toolParams.nodeData.name}</Typography>
+                <TextField
+                    name="chunk_size"
+                    type="number"
+                    defaultValue={toolParams.nodeData.chunk_size}
+                    label="Chunk size"
+                    inputProps={{ min: 32768, step: 32768 }}
+                />
+                <TextField
+                    name="batch_size"
+                    type="number"
+                    defaultValue="1"
+                    label="Batch size"
+                    inputProps={{ min: 1 }}
+                />
+                <TextField
+                    name="seed"
+                    type="number"
+                    defaultValue="0"
+                    label="Seed"
+                    inputProps={{ min: 0 }}
+                />
+                <TextField
+                    name="steps"
+                    type="number"
+                    defaultValue="50"
+                    label="Step count"
+                    inputProps={{ min: 1 }}
+                />
+                <FormControl>
+                    <InputLabel>Sampler</InputLabel>
                     <Select
-                        options={samplerOptions}
-                        defaultValue={selectedSampler}
-                        onChange={setSelectedSampler}
-                        className="custom-select"
-                    />
-                </label>
-                <hr />
-                <label>
-                    Scheduler:
+                        value={selectedSampler}
+                        onChange={event => setSelectedSampler(event.target.value)}
+                    >
+                        {typeNames.samplers.map(option => (
+                            <MenuItem value={option}>{option}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <FormControl>
+                    <InputLabel>Scheduler</InputLabel>
                     <Select
-                        options={schedulerOptions}
-                        defaultValue={selectedScheduler}
-                        onChange={setSelectedScheduler}
-                        className="custom-select"
-                    />
-                </label>
-                <hr />
-                <button type="reset">Clear</button>
-                <button type="submit">Generate</button>
-            </form>
-        </div>
+                        value={selectedScheduler}
+                        onChange={event => setSelectedScheduler(event.target.value)}
+                    >
+                        {typeNames.schedulers.map(option => (
+                            <MenuItem value={option}>{option}</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <ButtonGroup variant="contained" >
+                    <Button type="reset" variant="contained">Clear</Button>
+                    <Button type="submit" variant="contained">Generate</Button>
+                </ButtonGroup>
+            </Stack>
+        </Box>
     );
 }
 
