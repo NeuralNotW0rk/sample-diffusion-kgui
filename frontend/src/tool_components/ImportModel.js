@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
+import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 function ImportModel() {
 
@@ -17,9 +18,9 @@ function ImportModel() {
 
         setAwaitingResponse(true);
         fetch('/import-model', {
-                method: 'POST',
-                body: formData
-            })
+            method: 'POST',
+            body: formData
+        })
             .then(response => response.json())
             .then(data => {
                 setAwaitingResponse(false);
@@ -35,39 +36,49 @@ function ImportModel() {
     };
 
     return (
-        <div>
-            <h2> Import Model </h2>
-            <form method="post" onSubmit={handleSubmit}>
-                <label>
-                    Model name:
-                    <input name="model_name" defaultValue="" />
-                </label>
-                <hr />
-                <label>
-                    Model path:
-                    <input name="model_path" defaultValue="" />
-                </label>
-                <hr />
-                <label>
-                    Chunk size:
-                    <input name="chunk_size" type="number" defaultValue="65536" />
-                </label>
-                <hr />
-                <label>
-                    Sample rate:
-                    <input name="sample_rate" type="number" defaultValue="44100" />
-                </label>
-                <hr />
-                <label>
-                    Training steps:
-                    <input name="steps" type="number" defaultValue="0" />
-                </label>
-                <hr />
-                <button type="reset">Reset form</button>
-                <button type="submit">Submit form</button>
-            </form>
-        </div>
-      );
+        <Stack
+            component="form"
+            method="post"
+            onSubmit={handleSubmit}
+            spacing={2}
+            alignItems="center"
+        >
+            <Typography variant="h6">Import Model</Typography>
+            <TextField
+                name="model_name"
+                label="Model name"
+            />
+            <TextField
+                name="model_path"
+                label="Model path"
+            />
+            <TextField
+                name="chunk_size"
+                type="number"
+                defaultValue="65536"
+                label="Chunk size"
+                inputProps={{ min:1 }}
+            />
+            <TextField
+                name="sample_rate"
+                type="number"
+                defaultValue="44100"
+                label="Sample rate"
+                inputProps={{ min: 1 }}
+            />
+            <TextField
+                name="steps"
+                type="number"
+                defaultValue="0"
+                label="Training steps"
+                inputProps={{ min: 0 }}
+            />
+            <ButtonGroup variant="contained" >
+                <Button type="reset">Default</Button>
+                <Button type="submit">Import</Button>
+            </ButtonGroup>
+        </Stack>
+    );
 };
 
 export default ImportModel;

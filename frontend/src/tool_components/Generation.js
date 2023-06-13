@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, Box, ButtonGroup } from '@mui/material';
+import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 function Generation() {
     const defaultSampler = 'V_IPLMS';
@@ -41,71 +41,74 @@ function Generation() {
     };
 
     return (
-        <Box>
-            <Typography variant="h3">Generation</Typography>
-            <Stack
+        <Stack
             component="form"
             method="post"
             onSubmit={handleSubmit}
             spacing={2}
             alignItems="center">
-                <Typography variant="body1">Model: {toolParams.nodeData.name}</Typography>
-                <TextField
-                    name="chunk_size"
-                    type="number"
-                    defaultValue={toolParams.nodeData.chunk_size}
-                    label="Chunk size"
-                    inputProps={{ min: 32768, step: 32768 }}
-                />
-                <TextField
-                    name="batch_size"
-                    type="number"
-                    defaultValue="1"
-                    label="Batch size"
-                    inputProps={{ min: 1 }}
-                />
-                <TextField
-                    name="seed"
-                    type="number"
-                    defaultValue="0"
-                    label="Seed"
-                    inputProps={{ min: 0 }}
-                />
-                <TextField
-                    name="steps"
-                    type="number"
-                    defaultValue="50"
-                    label="Step count"
-                    inputProps={{ min: 1 }}
-                />
-                <FormControl>
-                    <InputLabel>Sampler</InputLabel>
-                    <Select
-                        value={selectedSampler}
-                        onChange={event => setSelectedSampler(event.target.value)}
-                    >
-                        {typeNames.samplers.map(option => (
-                            <MenuItem value={option}>{option}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <FormControl>
-                    <InputLabel>Scheduler</InputLabel>
-                    <Select
-                        value={selectedScheduler}
-                        onChange={event => setSelectedScheduler(event.target.value)}
-                    >
-                        {typeNames.schedulers.map(option => (
-                            <MenuItem value={option}>{option}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <ButtonGroup variant="contained" >
-                    <Button type="reset" variant="contained">Clear</Button>
-                    <Button type="submit" variant="contained">Generate</Button>
-                </ButtonGroup>
-            </Stack>
-        </Box>
+            <Typography variant="h6">Generation</Typography>
+            <TextField
+                name="model_name"
+                value={toolParams.nodeData.name}
+                label="Model"
+                disabled
+            />
+            <TextField
+                name="chunk_size"
+                type="number"
+                defaultValue={toolParams.nodeData.chunk_size}
+                label="Chunk size"
+                inputProps={{ min: 32768, step: 32768 }}
+            />
+            <TextField
+                name="batch_size"
+                type="number"
+                defaultValue="1"
+                label="Batch size"
+                inputProps={{ min: 1 }}
+            />
+            <TextField
+                name="seed"
+                type="number"
+                defaultValue="0"
+                label="Seed"
+                inputProps={{ min: 0 }}
+            />
+            <TextField
+                name="steps"
+                type="number"
+                defaultValue="50"
+                label="Step count"
+                inputProps={{ min: 1 }}
+            />
+            <FormControl>
+                <InputLabel>Sampler</InputLabel>
+                <Select
+                    value={selectedSampler}
+                    onChange={event => setSelectedSampler(event.target.value)}
+                >
+                    {typeNames.samplers.map(option => (
+                        <MenuItem value={option}>{option}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <FormControl>
+                <InputLabel>Scheduler</InputLabel>
+                <Select
+                    value={selectedScheduler}
+                    onChange={event => setSelectedScheduler(event.target.value)}
+                >
+                    {typeNames.schedulers.map(option => (
+                        <MenuItem value={option}>{option}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <ButtonGroup variant="contained" >
+                <Button type="reset">Default</Button>
+                <Button type="submit">Generate</Button>
+            </ButtonGroup>
+        </Stack>
     );
 }
 

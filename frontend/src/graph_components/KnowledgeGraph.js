@@ -1,33 +1,26 @@
-import React, { createContext, useEffect, useRef, useState } from 'react';
-import cytoscape, { use } from 'cytoscape';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu';
 import expandCollapse from 'cytoscape-expand-collapse';
 
-import ToolBox from '../tool_components/ToolBox';
 import defaultStyle from './Style';
 import defaultLayout from './Layout';
 import defaultOptions from './Options';
+
+import { ToolContext } from "../App";
 
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
 
-const ToolContext = createContext();
+function KnowledgeGraph({ pendingRefresh }) {
+    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setModelNames, setTagList} = useContext(ToolContext);
 
-function KnowledgeGraph() {
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
-    const [typeNames, setTypeNames] = useState(null);
-    const [modelNames, setModelNames] = useState(null);
-    const [tagList, setTagList] = useState(null);
-
-    const [activeTool, setActiveTool] = useState('default')
-    const [toolParams, setToolParams] = useState(null);
-    const [awaitingResponse, setAwaitingResponse] = useState(false);
-    const [pendingRefresh, setPendingRefresh] = useState(true);
 
     // -----------------
     //  COMPONENT SETUP
@@ -65,11 +58,11 @@ function KnowledgeGraph() {
 
         cy.expandCollapse(defaultOptions);
 
-        cy.nodes().on('expandcollapse.beforecollapse', function() {
+        cy.nodes().on('expandcollapse.beforecollapse', function () {
             var node = this;
             node.data('isExpanded', false);
         });
-        cy.nodes().on('expandcollapse.beforeexpand', function() {
+        cy.nodes().on('expandcollapse.beforeexpand', function () {
             var node = this;
             node.data('isExpanded', true);
         });
@@ -230,7 +223,7 @@ function KnowledgeGraph() {
 
             // Replace elements and restore positions
             const positions = cy.nodes().map((ele) => {
-                return {id: ele.id(), pos: ele.position()};   
+                return { id: ele.id(), pos: ele.position() };
             });
 
             cy.remove('*');
@@ -242,7 +235,7 @@ function KnowledgeGraph() {
 
             // Apply layout if number of nodes has changed
             cy.nodes().length === positions.length || applyFcose();
-            
+
 
             // Expand and collapse setup
             cy.$('node[type="batch"]').data('isExpanded', true);
@@ -277,7 +270,7 @@ function KnowledgeGraph() {
                 const nodeData = cy.$id(toolParams.nodeData.id).json().data;
                 setToolParams({ nodeData });
             };
-            
+
         }
     }, [graphData]);
 
@@ -287,7 +280,13 @@ function KnowledgeGraph() {
 
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
-        var layout = cy.layout({...defaultLayout, randomize});
+        var layout = cy.layout({
+            ...defaultLayout,
+            randomize,
+            tilingCompareBy: (nodeId1, nodeId2) => {
+                return cy.$id(nodeId1).data('batch_idx') - cy.$id(nodeId2).data('batch_idx');
+            }
+        });
 
         layout.run();
     };
@@ -297,34 +296,9 @@ function KnowledgeGraph() {
     // -----------
 
     return (
-        <ToolContext.Provider value={{
-            typeNames,
-            modelNames,
-            tagList,
-            toolParams,
-            setActiveTool,
-            setAwaitingResponse,
-            setPendingRefresh
-        }}>
-            <div className="main-content">
-                <div className="toolbar">
-                    <h1>Test Graph</h1>
-                    <button onClick={fetchGraphData}>Refresh</button>
-                    {awaitingResponse ? (
-                        <div>
-                            <h2>Waiting for response...</h2>
-                        </div>
-                    ) : (
-                        <ToolBox activeTool={activeTool}/>
-                    )}
-                </div>
-                <div ref={cytoscapeContainerRef} style={{ width: '80%', height: '100%', textAlign: 'left' }} />
-
-            </div>
-        </ToolContext.Provider>
+        <div ref={cytoscapeContainerRef} style={{ width: '100%', height: '100%', textAlign: 'left' }} />
     );
 
 };
 
 export default KnowledgeGraph
-export { ToolContext };

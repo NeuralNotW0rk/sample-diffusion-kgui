@@ -1,11 +1,12 @@
 import React, { useContext, useEffect } from "react";
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 
 function PlayAudio() {
     const { toolParams } = useContext(ToolContext);
+    
     const audioContext = new AudioContext({ latencyHint: 'playback' })
 
     useEffect(() => {

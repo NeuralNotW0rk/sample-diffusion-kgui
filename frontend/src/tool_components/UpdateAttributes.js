@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import CreatableSelect from "react-select/creatable"
+import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 function UpdateAttributes() {
 
@@ -10,39 +10,31 @@ function UpdateAttributes() {
 
     const [alias, setAlias] = useState('');
     const [caption, setCaption] = useState('');
-    const [selectedTags, setSelectedTags] = useState(null);
-    const [tagOptions, setTagOptions] = useState(null);
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [tagOptions, setTagOptions] = useState([]);
 
     useEffect(() => {
         setAlias(toolParams.nodeData.alias || '');
         setCaption(toolParams.nodeData.caption || '');
         setSelectedTags([]);
-        toolParams.nodeData.tags && setSelectedTags(toolParams.nodeData.tags.split(',').map((value) => ({
-            value,
-            label: value
-        })));
-        setTagOptions(tagList.map((value) => ({
-            value: value.tag,
-            label: value.tag
-        })));
+        toolParams.nodeData.tags && setSelectedTags(toolParams.nodeData.tags.split(','));
+        setTagOptions(tagList.map((option) => {
+            return option.tag;
+        }));
     }, [toolParams]);
 
     function handleSubmit(e) {
-        // Prevent the browser from reloading the page
         e.preventDefault();
 
-        // Read the form data
         const form = e.target;
         const formData = new FormData(form);
-        formData.append('name', toolParams.nodeData.name);
-        
-        const tagLabels = selectedTags.map((element) => element.label)
-        tagLabels && formData.append('tags', tagLabels);
+
+        formData.append('name', toolParams.nodeData.name)
+        formData.append('tags', selectedTags);
 
         formData.get('alias') === '' && formData.delete('alias');
         formData.get('caption') === '' && formData.delete('caption');
-
-
+        
         setAwaitingResponse(true);
         fetch('/update-element', {
             method: 'POST',
@@ -61,45 +53,59 @@ function UpdateAttributes() {
     };
 
     return (
-        <div>
-            <h2>Update Attributes</h2>
-            <form method="post" onSubmit={handleSubmit}>
-                Name: {toolParams.nodeData.name}
-                <hr />
-                <label>
-                    Alias:
-                    <input
-                        name="alias"
-                        value={alias}
-                        onChange={(e) => setAlias(e.target.value)}
+        <Stack
+            component="form"
+            method="post"
+            onSubmit={handleSubmit}
+            spacing={2}
+            alignItems="center"
+        >
+            <Typography variant="h6">Update Attributes</Typography>
+            <TextField
+                name="name"
+                value={toolParams.nodeData.name}
+                label="Sample name"
+                disabled
+            />
+            <TextField
+                name="alias"
+                value={alias}
+                onChange={(e) => setAlias(e.target.value)}
+                label="Alias"
+            />
+            <Autocomplete
+                fullWidth
+                multiple
+                freeSolo
+                options={tagOptions}
+                value={selectedTags}
+                onChange={(e, value) => {
+                    setSelectedTags(value);
+                }}
+                renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                    ))
+                }
+                renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Tags"
                     />
-                </label>
-                <hr />
-                <label>
-                    Tags:
-                    <CreatableSelect
-                        value={selectedTags}
-                        onChange={setSelectedTags}
-                        options={tagOptions}
-                        isMulti={true}
-                        isClearable={false}
-                        className="custom-select"
-                    />
-                </label>
-                <hr />
-                <label>
-                    Caption:
-                    <input
-                        name="caption"
-                        value={caption}
-                        onChange={(e) => setCaption(e.target.value)}
-                    />
-                </label>
-                <hr />
-                <button type="reset">Clear</button>
-                <button type="submit">Apply</button>
-            </form>
-        </div>
+                  )}
+
+            />
+            <TextField
+                name="caption"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                label="Caption"
+            />
+            <ButtonGroup variant="contained" >
+                <Button type="reset">Default</Button>
+                <Button type="submit">Update</Button>
+            </ButtonGroup>
+        </Stack>
     );
 };
 

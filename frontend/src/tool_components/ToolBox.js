@@ -6,35 +6,22 @@ import Generation from './Generation';
 import Variation from './Variation';
 import UpdateAttributes from './UpdateAttributes';
 import PlayAudio from './PlayAudio';
-import './Tools.css';
+//import './Tools.css';
 
-import { ToolContext } from '../graph_components/KnowledgeGraph';
+import { ToolContext } from "../App";
 
 
-function ToolBox({activeTool}) {
-
-  const { setActiveTool } = useContext(ToolContext);
+function ToolBox({ activeTool }) {
 
   return (
     <div className="toolbox-component">
-      <div className="tab-buttons">
-        <button
-          className={activeTool === 0 ? 'active' : ''}
-          onClick={() => setActiveTool('none')}
-        >
-          Clear
-        </button>
-      </div>
-      <hr />
-      <div className="tab-content">
-        {activeTool === 'importModel' && <ImportModel />}
-        {activeTool === 'externalSource' && <ExternalSource />}
-        {activeTool === 'generation' && <Generation />}
-        {activeTool === 'variation' && <Variation />}
-        {activeTool === 'details' && <ViewDetails />}
-        {activeTool === 'updateAttributes' && <UpdateAttributes />}
-        {activeTool === 'playAudio' && <PlayAudio />}
-      </div>
+      {activeTool === 'importModel' && <ImportModel />}
+      {activeTool === 'externalSource' && <ExternalSource />}
+      {activeTool === 'generation' && <Generation />}
+      {activeTool === 'variation' && <Variation />}
+      {activeTool === 'details' && <ViewDetails />}
+      {activeTool === 'updateAttributes' && <UpdateAttributes />}
+      {activeTool === 'playAudio' && <PlayAudio />}
     </div>
   );
 };

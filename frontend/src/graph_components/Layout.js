@@ -1,3 +1,5 @@
+
+
 const defaultLayout = {
     name: 'fcose',
     // 'draft', 'default' or 'proof' 
@@ -58,7 +60,7 @@ const defaultLayout = {
     // If node1 is less then node2 by some ordering criterion ``tilingCompareBy(nodeId1, nodeId2)`` must return a negative value
     // If node1 is greater then node2 by some ordering criterion ``tilingCompareBy(nodeId1, nodeId2)`` must return a positive value
     // If node1 is equal to node2 by some ordering criterion ``tilingCompareBy(nodeId1, nodeId2)`` must return 0
-    tilingCompareBy: undefined, 
+    tilingCompareBy: undefined,
     // Represents the amount of the vertical space to put between the zero degree members during the tiling operation(can also be a function)
     tilingPaddingVertical: 10,
     // Represents the amount of the horizontal space to put between the zero degree members during the tiling operation(can also be a function)

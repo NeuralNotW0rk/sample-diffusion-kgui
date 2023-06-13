@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 function ViewDetails() {
     const { toolParams } = useContext(ToolContext);

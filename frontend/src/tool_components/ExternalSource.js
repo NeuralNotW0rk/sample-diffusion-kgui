@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
+import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../graph_components/KnowledgeGraph";
+import { ToolContext } from "../App";
 
 function ExternalSource() {
 
@@ -17,9 +18,9 @@ function ExternalSource() {
 
         setAwaitingResponse(true);
         fetch('/add-external-source', {
-                method: 'POST',
-                body: formData
-            })
+            method: 'POST',
+            body: formData
+        })
             .then(response => response.json())
             .then(data => {
                 setAwaitingResponse(false);
@@ -35,24 +36,28 @@ function ExternalSource() {
     };
 
     return (
-        <div>
-            <h2> External Source </h2>
-            <form method="post" onSubmit={handleSubmit}>
-                <label>
-                    Source name:
-                    <input name="source_name" defaultValue="" />
-                </label>
-                <hr />
-                <label>
-                    Source path:
-                    <input name="source_root" defaultValue="" />
-                </label>
-                <hr />
-                <button type="reset">Reset form</button>
-                <button type="submit">Submit form</button>
-            </form>
-        </div>
-      );
+        <Stack
+            component="form"
+            method="post"
+            onSubmit={handleSubmit}
+            spacing={2}
+            alignItems="center"
+        >
+            <Typography variant="h6">External Source</Typography>
+            <TextField
+                name="source_name"
+                label="Source name"
+            />
+            <TextField
+                name="source_root"
+                label="Source path"
+            />
+            <ButtonGroup variant="contained" >
+                <Button type="reset">Default</Button>
+                <Button type="submit">Import</Button>
+            </ButtonGroup>
+        </Stack>
+    );
 };
 
 export default ExternalSource;
