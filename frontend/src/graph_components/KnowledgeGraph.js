@@ -15,7 +15,7 @@ cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
 
 function KnowledgeGraph({ pendingRefresh }) {
-    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setModelNames, setTagList} = useContext(ToolContext);
+    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setProjectName, setModelNames, setTagList} = useContext(ToolContext);
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
@@ -46,6 +46,17 @@ function KnowledgeGraph({ pendingRefresh }) {
             console.error('Error fetching type names:', error);
         }
     };
+
+    const fetchProjectName = async () => {
+        try {
+            const response = await fetch('/project');
+            const data = await response.json();
+            setProjectName(data.project_name);
+        } catch (error) {
+            console.error('Error fetching project name:', error);
+        }
+    };
+
 
     // Initialize graph
     useEffect(() => {
@@ -202,6 +213,7 @@ function KnowledgeGraph({ pendingRefresh }) {
         });
 
         fetchTypeNames();
+        fetchProjectName();
 
         return () => {
             cy.destroy();

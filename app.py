@@ -12,8 +12,7 @@ from diffusion_library.scheduler import SchedulerType
 
 from ddkg import DDKnowledgeGraph
 
-DEFAULT_PATH = './data'
-DEFAULT_SD_REPO = '../sample-diffusion'
+PROJECT_DIR = Path('projects')
 
 ARG_TYPES = {
     # General inference
@@ -34,12 +33,32 @@ device_accelerator = torch.device(device_type_accelerator)
 use_autocast = True  # TODO: Make configurable
 
 request_handler = RequestHandler(device_accelerator, optimize_memory_use=False, use_autocast=True)
-ddkg = DDKnowledgeGraph(DEFAULT_PATH)
+ddkg = None
 
+# --------------------
+#  Project Management
+# --------------------
+
+@app.route('/load', methods=['POST'])
+def load_project():
+    global ddkg
+    ddkg = DDKnowledgeGraph(str(PROJECT_DIR / request.form['project_name']))
+    if ddkg:
+        project_name = ddkg.root.name
+        return jsonify({
+            'message': f'Project loaded: {project_name}',
+            'project': project_name
+        })
+    return jsonify({'message': 'No project loaded'})
 
 # ---------------
 #  Data requests
 # ---------------
+
+# Sends the current project name
+@app.route('/project', methods=['GET'])
+def get_project():
+    return jsonify({'project_name': ddkg.root.name})
 
 
 # Sends lists of type names for samplers and schedulers
@@ -49,7 +68,6 @@ def get_type_names():
         'samplers': [e.value for e in SamplerType],
         'schedulers': [e.value for e in SchedulerType]
     })
-
 
 # Sends the current graph state
 @app.route('/graph', methods=['GET'])
@@ -82,7 +100,7 @@ def import_model():
     ):
         message = 'Model imported successfully'
     else:
-        message = f'Model import failed: model id {request.form["name"]} already exists'
+        message = f'Model import failed: model id {request.form["name"]}'
     
     return jsonify({'message': message})
 

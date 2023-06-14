@@ -1,17 +1,20 @@
 
-import React, { createContext, useState } from 'react';
-import { ThemeProvider, createTheme, styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import React, { createContext, useEffect, useState } from 'react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import { CreateNewFolder, FolderOpen, MenuOpen, Save } from '@mui/icons-material';
 
 //import './App.css';
 
 import KnowledgeGraph from './graph_components/KnowledgeGraph';
-import ToolBox from './tool_components/ToolBox';
+import ViewDetails from './tool_components/ViewDetails';
+import ImportModel from './tool_components/ImportModel';
+import ExternalSource from './tool_components/ExternalSource';
+import Generation from './tool_components/Generation';
+import Variation from './tool_components/Variation';
+import UpdateAttributes from './tool_components/UpdateAttributes';
+import PlayAudio from './tool_components/PlayAudio';
+import LoadProject from './tool_components/LoadProject';
 
 
 const drawerWidth = 300;
@@ -42,6 +45,7 @@ const defaultTheme = createTheme({
 const ToolContext = createContext();
 
 function App() {
+  const [projectName, setProjectName] = useState(null);
   const [typeNames, setTypeNames] = useState(null);
   const [modelNames, setModelNames] = useState(null);
   const [tagList, setTagList] = useState(null);
@@ -50,6 +54,15 @@ function App() {
   const [toolParams, setToolParams] = useState(null);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [pendingRefresh, setPendingRefresh] = useState(true);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (<ThemeProvider theme={defaultTheme}>
     <ToolContext.Provider value={{
@@ -63,12 +76,48 @@ function App() {
       setToolParams,
       setActiveTool,
       setAwaitingResponse,
-      setPendingRefresh
+      setPendingRefresh,
+      setProjectName,
     }}>
       <Box height='100vh' display='flex' flexDirection='col'>
         <CssBaseline />
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
+            <IconButton
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClick}
+            >
+              <MenuOpen />
+            </IconButton>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+            >
+              <MenuItem onClick={() => {
+                handleClose();
+              }}>
+                <ListItemIcon>
+                  <Save fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Save</ListItemText>
+              </MenuItem>
+              <MenuItem onClick={() => {
+                handleClose();
+                setActiveTool('loadProject');
+              }}>
+                <ListItemIcon>
+                  <FolderOpen fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Open</ListItemText>
+              </MenuItem>
+            </Menu>
             <Typography variant="h6" noWrap component="div">
               Dance Diffusion KGUI
             </Typography>
@@ -83,13 +132,29 @@ function App() {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto', p: 2}}>
+          <Box sx={{ overflow: 'auto', p: 2 }}>
+            <Typography variant="h6" component="div" align='center'>
+              {projectName ? (
+                projectName
+              ) : (
+                "No project selected"
+              )}
+            </Typography>
             {awaitingResponse ? (
               <Typography variant="h6" noWrap component="div">
                 Waiting for response...
               </Typography>
             ) : (
-              <ToolBox activeTool={activeTool} />
+              <div>
+                {activeTool === 'loadProject' && <LoadProject />}
+                {activeTool === 'importModel' && <ImportModel />}
+                {activeTool === 'externalSource' && <ExternalSource />}
+                {activeTool === 'generation' && <Generation />}
+                {activeTool === 'variation' && <Variation />}
+                {activeTool === 'details' && <ViewDetails />}
+                {activeTool === 'updateAttributes' && <UpdateAttributes />}
+                {activeTool === 'playAudio' && <PlayAudio />}
+              </div>
             )}
           </Box>
         </Drawer>

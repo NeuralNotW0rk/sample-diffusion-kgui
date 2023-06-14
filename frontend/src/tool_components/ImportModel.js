@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
-import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip } from '@mui/material';
+import React, { useContext, useState } from "react";
+import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, IconButton, InputAdornment, Icon, ListItemIcon } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import './Tools.css';
 
 import { ToolContext } from "../App";
 
 function ImportModel() {
-
     const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
     function handleSubmit(e) {
@@ -47,17 +47,50 @@ function ImportModel() {
             <TextField
                 name="model_name"
                 label="Model name"
+                required
             />
+            <Button
+                variant="contained"
+                component="label"
+            >
+                Upload File
+                <input
+                    type="file"
+                    hidden
+                />
+            </Button>
             <TextField
                 name="model_path"
                 label="Model path"
+                required
+                /*
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                edge="end"
+                                component="label"
+                            >
+                                <Search />
+                                <input
+                                    type="file"
+                                    hidden
+                                    onChange={(e) => {
+                                        console.log(e);
+                                    }}
+                                />
+                            </IconButton>
+                        </InputAdornment>
+                    )
+                }}
+                */
             />
             <TextField
                 name="chunk_size"
                 type="number"
                 defaultValue="65536"
                 label="Chunk size"
-                inputProps={{ min:1 }}
+                inputProps={{ min: 1 }}
             />
             <TextField
                 name="sample_rate"

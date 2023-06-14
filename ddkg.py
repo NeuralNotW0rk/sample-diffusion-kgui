@@ -55,13 +55,14 @@ class DDKnowledgeGraph():
             copy=False,
     ) -> bool:
         
+        # Model already exists
+        assert name != '', 'Name should not be empty'
+        assert not self.G.has_node(name), f'Model with name {name} already exists'
+        
         if copy:
             path_new = check_dir(self.root / model_dir) / Path(path).name
             os.system(f'cp {path} {path_new}')
             path = path_new
-
-        # Model already exists
-        if name in nx.nodes(self.G): return False
 
         # Create model node
         self.G.add_node(

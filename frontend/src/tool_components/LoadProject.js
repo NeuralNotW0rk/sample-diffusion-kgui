@@ -1,12 +1,9 @@
 import React, { useContext } from "react";
 import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
-import './Tools.css';
-
 import { ToolContext } from "../App";
 
-function ExternalSource() {
-
-    const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
+function LoadProject() {
+    const { setAwaitingResponse, setPendingRefresh, setProjectName } = useContext(ToolContext);
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -17,7 +14,7 @@ function ExternalSource() {
         const formData = new FormData(form);
 
         setAwaitingResponse(true);
-        fetch('/add-external-source', {
+        fetch('/load', {
             method: 'POST',
             body: formData
         })
@@ -25,6 +22,7 @@ function ExternalSource() {
             .then(data => {
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
+                setProjectName(data.project);
                 console.log(data.message); // Success message from the server
             })
             .catch(error => {
@@ -43,23 +41,17 @@ function ExternalSource() {
             spacing={2}
             alignItems="center"
         >
-            <Typography variant="h6">External Source</Typography>
+            <Typography variant="h6">Load/Create Project</Typography>
             <TextField
-                name="source_name"
-                label="Source name"
-                required
-            />
-            <TextField
-                name="source_root"
-                label="Source path"
+                name="project_name"
+                label="Project name"
                 required
             />
             <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Import</Button>
+                <Button type="submit">Load</Button>
             </ButtonGroup>
         </Stack>
     );
 };
 
-export default ExternalSource;
+export default LoadProject;
