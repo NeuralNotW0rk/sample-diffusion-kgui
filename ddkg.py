@@ -67,7 +67,7 @@ class DDKnowledgeGraph():
         # Create model node
         self.G.add_node(
             name,
-            path=str(path),
+            path=str(path.relative_to(self.root)),
             chunk_size=chunk_size,
             sample_rate=sample_rate,
             steps=steps,
@@ -264,7 +264,7 @@ class DDKnowledgeGraph():
                 alias=audio_name[-12:],
                 batch_index=batch_idx,
                 type='audio',
-                path=str(audio_path),
+                path=str(audio_path.relative_to(self.root)),
                 sample_rate=sample_rate,
                 chunk_size=chunk_size,
                 created=current_time,

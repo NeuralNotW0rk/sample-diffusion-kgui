@@ -224,6 +224,7 @@ function KnowledgeGraph({ pendingRefresh }) {
     useEffect(() => {
         if (pendingRefresh) {
             fetchGraphData();
+            fetchProjectName();
             setPendingRefresh(false);
         }
     }, [pendingRefresh]);

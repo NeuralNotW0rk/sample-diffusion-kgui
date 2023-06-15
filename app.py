@@ -129,13 +129,13 @@ def handle_sd_request():
     args = {k : ARG_TYPES[k](v) if k in ARG_TYPES else v for k, v in request.form.items()}
 
     model_node = ddkg.G.nodes[args['model_name']]
-    args['model_path'] = model_node['path']
+    args['model_path'] = ddkg.root / model_node['path']
     args['sample_rate'] = model_node['sample_rate']
 
     audio_source = None
     if 'audio_source_name' in args:
         audio_node = ddkg.G.nodes[args['audio_source_name']]
-        audio_source = load_audio(device_accelerator, audio_node['path'], audio_node['sample_rate'])
+        audio_source = load_audio(device_accelerator, ddkg.root / audio_node['path'], audio_node['sample_rate'])
     else:
         args['audio_source_name'] = None
 

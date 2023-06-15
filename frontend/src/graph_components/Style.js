@@ -18,6 +18,8 @@ const defaultStyle = [
     {
         selector: 'edge',
         style: {
+            'color': 'white',
+            'edge-text-rotation': 'autorotate',
             'curve-style': 'straight',
             'target-arrow-shape': 'triangle'
         },
