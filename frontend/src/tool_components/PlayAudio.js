@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from "react";
+import { Stack, Typography, Button, ButtonGroup } from "@mui/material";
 import './Tools.css';
 
 import { ToolContext } from "../App";
@@ -34,12 +35,16 @@ function PlayAudio() {
     }
 
     return (
-        <div>
-            <h2>Play Audio</h2>
-            <p>{toolParams.nodeData.alias}</p>
-            <p>{toolParams.nodeData.name}.wav</p>
-            <button onClick={initSound}>Replay</button>
-        </div>
+        <Stack
+            spacing={2}
+            alignItems="center"
+        >
+            <Typography variant="h6">Play Audio</Typography>
+            <Typography variant="body1">{toolParams.nodeData.alias}</Typography>
+            <ButtonGroup variant="contained" >
+                <Button onClick={initSound}>Replay</Button>
+            </ButtonGroup>
+        </Stack>
     );
 }
 

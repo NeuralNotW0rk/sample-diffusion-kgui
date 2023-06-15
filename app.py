@@ -78,7 +78,7 @@ def get_graph():
 # Sends an audio file corresponding to the given name
 @app.route('/audio', methods=['GET'])
 def get_audio():
-    path = Path(ddkg.G.nodes[request.args.get('name')]['path']).resolve()
+    path = (ddkg.root / ddkg.G.nodes[request.args.get('name')]['path']).resolve()
     return send_file(str(path))
 
 

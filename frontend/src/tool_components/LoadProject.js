@@ -3,7 +3,7 @@ import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material
 import { ToolContext } from "../App";
 
 function LoadProject() {
-    const { setAwaitingResponse, setPendingRefresh, setProjectName } = useContext(ToolContext);
+    const { setAwaitingResponse, setPendingRefresh, setProjectName, setActiveTool } = useContext(ToolContext);
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
@@ -23,6 +23,7 @@ function LoadProject() {
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
                 setProjectName(data.project);
+                setActiveTool('default');
                 console.log(data.message); // Success message from the server
             })
             .catch(error => {

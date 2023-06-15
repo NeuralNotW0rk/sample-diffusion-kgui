@@ -1,8 +1,8 @@
 
 import React, { createContext, useEffect, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CreateNewFolder, FolderOpen, MenuOpen, Save } from '@mui/icons-material';
+import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { CreateNewFolder, FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
 
 //import './App.css';
 
@@ -17,7 +17,7 @@ import PlayAudio from './tool_components/PlayAudio';
 import LoadProject from './tool_components/LoadProject';
 
 
-const drawerWidth = 300;
+const drawerWidth = 400;
 
 const defaultTheme = createTheme({
   palette: {
@@ -102,11 +102,12 @@ function App() {
             >
               <MenuItem onClick={() => {
                 handleClose();
+                setPendingRefresh(true);
               }}>
                 <ListItemIcon>
-                  <Save fontSize="small" />
+                  <Refresh fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>Save</ListItemText>
+                <ListItemText>Refresh graph</ListItemText>
               </MenuItem>
               <MenuItem onClick={() => {
                 handleClose();
@@ -132,14 +133,15 @@ function App() {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto', p: 2 }}>
-            <Typography variant="h6" component="div" align='center'>
+          <Box sx={{ overflow: 'auto'}}>
+            <Typography variant="h4" component="div" align='center'>
               {projectName ? (
                 projectName
               ) : (
                 "No project selected"
               )}
             </Typography>
+            <Divider/>
             {awaitingResponse ? (
               <Typography variant="h6" noWrap component="div">
                 Waiting for response...
