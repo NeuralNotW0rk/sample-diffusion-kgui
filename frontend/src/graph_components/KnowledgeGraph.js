@@ -15,7 +15,7 @@ cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
 
 function KnowledgeGraph({ pendingRefresh }) {
-    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setProjectName, setModelNames, setTagList} = useContext(ToolContext);
+    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setProjectName, setModelNames, setTagList } = useContext(ToolContext);
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
@@ -309,7 +309,7 @@ function KnowledgeGraph({ pendingRefresh }) {
     // -----------
 
     return (
-        <div ref={cytoscapeContainerRef} style={{ width: '100%', height: '100%', textAlign: 'left' }} />
+            <div ref={cytoscapeContainerRef} style={{ width: '100%', height: '100%', textAlign: 'left' }} />
     );
 
 };

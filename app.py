@@ -2,9 +2,10 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 import torch
+import torchaudio
 from pathlib import Path
 
-from util.util import load_audio
+from util.util import load_audio, crop_audio
 from util.platform import get_torch_device_type
 from dance_diffusion.api import RequestHandler, Request, RequestType, ModelType
 from diffusion_library.sampler import SamplerType
@@ -128,14 +129,18 @@ def handle_sd_request():
     # Cast args
     args = {k : ARG_TYPES[k](v) if k in ARG_TYPES else v for k, v in request.form.items()}
 
+    # Get model parameters from graph by name
     model_node = ddkg.G.nodes[args['model_name']]
     args['model_path'] = ddkg.root / model_node['path']
     args['sample_rate'] = model_node['sample_rate']
 
+    # Load audio source if specified
     audio_source = None
     if 'audio_source_name' in args:
         audio_node = ddkg.G.nodes[args['audio_source_name']]
-        audio_source = load_audio(device_accelerator, ddkg.root / audio_node['path'], audio_node['sample_rate'])
+        audio_source = crop_audio(load_audio(device_accelerator, ddkg.root / audio_node['path'], model_node['sample_rate']), args['chunk_size'])
+        # Duplicate channel if source is mono
+        if audio_source.size(0) == 1: audio_source = audio_source.repeat(2, 1)
     else:
         args['audio_source_name'] = None
 
@@ -182,3 +187,7 @@ def update_element():
         dict(request.form)
     )
     return jsonify({'message': 'success'})
+
+@app.route('/remove-element', methods=['POST'])
+def remove_element():
+    pass

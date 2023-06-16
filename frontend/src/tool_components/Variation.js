@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup } from '@mui/material';
+import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import './Tools.css';
 
 import { ToolContext } from "../App";
@@ -16,19 +16,20 @@ function Variation() {
         setPendingRefresh
     } = useContext(ToolContext);
     const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size || '65536');
-
+    const [resample, setResample] = useState(true);
     const [selectedModel, setSelectedModel] = useState(modelNames[0]);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
 
     function handleSubmit(e) {
         e.preventDefault();
-        
+
         const form = e.target;
         const formData = new FormData(form);
         formData.append('mode', 'Variation');
         formData.append('audio_source_name', toolParams.nodeData.name);
         formData.append('sample_rate', toolParams.nodeData.sample_rate);
+        formData.append('resample', resample);
         formData.append('model_name', selectedModel);
         formData.append('sampler_type_name', selectedSampler);
         formData.append('scheduler_type_name', selectedScheduler);
