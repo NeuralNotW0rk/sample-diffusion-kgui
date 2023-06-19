@@ -89,14 +89,12 @@ function KnowledgeGraph({ pendingRefresh }) {
                         applyFcose(true);
                     }
                 },
-
                 {
                     content: 'Import model',
                     select: function () {
                         setActiveTool('importModel');
                     }
                 },
-
                 {
                     content: 'Add external source',
                     select: function () {
@@ -119,7 +117,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                         setToolParams({ nodeData });
                     }
                 },
-
                 {
                     content: 'Details',
                     select: function (ele) {
@@ -162,7 +159,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                         setToolParams({ nodeData });
                     }
                 },
-
                 {
                     content: 'Play',
                     select: function (ele) {
@@ -172,8 +168,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                         setToolParams({ nodeData });
                     }
                 },
-
-
                 {
                     content: 'Edit',
                     select: function (ele) {
@@ -183,7 +177,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                         setToolParams({ nodeData });
                     }
                 },
-
                 {
                     content: 'Variation',
                     select: function (ele) {
@@ -209,6 +202,56 @@ function KnowledgeGraph({ pendingRefresh }) {
                         setToolParams({ nodeData });
                     }
                 },
+            ]
+        });
+
+        // Model nodes
+        cy.cxtmenu({
+            selector: 'node[type="model"]',
+            commands: [
+                {
+                    content: 'Generate',
+                    select: function (ele) {
+                        setActiveTool('generation');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                }
+            ]
+        });
+
+        // External source nodes
+        cy.cxtmenu({
+            selector: 'node[type="external"]',
+            commands: [
+                {
+                    content: 'Details',
+                    select: function (ele) {
+                        setActiveTool('details');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+                {
+                    content: 'Rescan',
+                    select: function (ele) {
+                        setActiveTool('rescanSource');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                }
             ]
         });
 

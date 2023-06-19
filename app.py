@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 import torch
-import torchaudio
 from pathlib import Path
 
 from util.util import load_audio, crop_audio
@@ -105,7 +104,7 @@ def import_model():
     
     return jsonify({'message': message})
 
-# Copies a model to the ddkg dir
+# Adds an external source
 @app.route('/add-external-source', methods=['POST'])
 def add_source():
     ddkg.add_external_source(
@@ -114,6 +113,13 @@ def add_source():
     )
     ddkg.scan_external_source(
         request.form['source_name']
+    )
+    return jsonify({'message': 'success'})
+
+@app.route('/rescan-source', methods=['POST'])
+def scan_source():
+    ddkg.scan_external_source(
+        request.args.get('name')
     )
     return jsonify({'message': 'success'})
 

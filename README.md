@@ -15,7 +15,7 @@ This is an early prototype, so expect bugs and major changes
 
 ## Planned features
 
-- Additional inference modes (interpolation, intpainting, etc)
+- Additional inference modes (interpolation, inpainting, etc)
 - Search and filter
 - Export filtered datasets for fine-tuning
 - Representation of custom processes
@@ -63,7 +63,7 @@ npm install
 
 ### Backend
 
-cd to sample-diffusion-kgui, and make sure you have your sample-diffusion conda env active. Then run:
+cd to sample-diffusion-kgui and make sure you have your sample-diffusion conda env active. Then run:
 
 ```sh
 flask run
@@ -87,5 +87,5 @@ npm run start
 
 ### Inference
 
-- Right clicking a model will bring up an option to use it for generating a batch
-- Right clicking an audio node will allow you to use it as a source for variation
+- Right-clicking a model will bring up an option to use it for generating a batch
+- Right-clicking an audio node will allow you to use it as a source for variation

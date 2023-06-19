@@ -15,6 +15,7 @@ import Variation from './tool_components/Variation';
 import UpdateAttributes from './tool_components/UpdateAttributes';
 import PlayAudio from './tool_components/PlayAudio';
 import LoadProject from './tool_components/LoadProject';
+import RescanSource from './tool_components/RescanSource';
 
 
 const drawerWidth = 400;
@@ -151,6 +152,7 @@ function App() {
                 {activeTool === 'loadProject' && <LoadProject />}
                 {activeTool === 'importModel' && <ImportModel />}
                 {activeTool === 'externalSource' && <ExternalSource />}
+                {activeTool === 'rescanSource' && <RescanSource />}
                 {activeTool === 'generation' && <Generation />}
                 {activeTool === 'variation' && <Variation />}
                 {activeTool === 'details' && <ViewDetails />}

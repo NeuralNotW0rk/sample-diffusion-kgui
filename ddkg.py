@@ -104,7 +104,6 @@ class DDKnowledgeGraph():
         # Add/update audio sets
         for audio_set_dir in source_root.iterdir():
             if audio_set_dir.is_dir():
-                print(audio_set_dir)
                 set_name = audio_set_dir.name
                 if not self.G.has_node(audio_set_dir.name):
                     self.G.add_node(
@@ -124,7 +123,7 @@ class DDKnowledgeGraph():
                 for idx, sample_path in enumerate(audio_set_dir.iterdir()):
                     if not self.G.has_node(sample_path.name):
                         if sample_path.suffix in ['.wav', '.mp3']:
-                            _, sample_rate = sf.read(str(sample_path)) # TODO: get sample rate without loading whole file
+                            _, sample_rate = sf.read(str(sample_path))
                             self.G.add_node(
                                 sample_path.stem,
                                 alias=sample_path.stem,
