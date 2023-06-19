@@ -1,6 +1,5 @@
 import os
 import json
-import enum
 from pathlib import Path
 from time import time
 import networkx as nx

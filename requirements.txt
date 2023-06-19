@@ -1,1 +1,4 @@
 flask
+flask-cors
+soundfile
+networkx

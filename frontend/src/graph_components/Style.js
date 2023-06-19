@@ -1,9 +1,14 @@
+const gradientColor1 = '#002254' // Blue
+const gradientColor2 = '#004294' // Purple
+const gradientColor3 = '#5b3285'
+const gradientColor4 = '#7e1b6a'
+const gradientColor5 = '#8f004a'
+
 const audioColor = '#278' // Pale cyan
-const modelColor = '#527' // Purple
 const batchColor = '#000' // Black
-const externalColor = '#14a' // Blue
 const selectedColor = '#888' // Light gray
-const unassignedColor1 = '#914' // Maroon?
+const modelColor = gradientColor3
+const externalColor = gradientColor2
 
 const defaultStyle = [
     // General style configuration
@@ -64,6 +69,41 @@ const defaultStyle = [
             'height': 30,
         }
     },
+    {
+        selector: 'node[type="audio"][rating="1"]',
+        style: {
+            'border-color': gradientColor1,
+            'border-width': 2,
+        }
+    },
+    {
+        selector: 'node[type="audio"][rating="2"]',
+        style: {
+            'border-color': gradientColor2,
+            'border-width': 2,
+        }
+    },
+    {
+        selector: 'node[type="audio"][rating="3"]',
+        style: {
+            'border-color': gradientColor3,
+            'border-width': 2,
+        }
+    },
+    {
+        selector: 'node[type="audio"][rating="4"]',
+        style: {
+            'border-color': gradientColor4,
+            'border-width': 2,
+        }
+    },
+    {
+        selector: 'node[type="audio"][rating="5"]',
+        style: {
+            'border-color': gradientColor5,
+            'border-width': 2,
+        }
+    },
 
     // Edge-specific style configuration
     {
@@ -110,3 +150,4 @@ const defaultStyle = [
 ]
 
 export default defaultStyle
+export {gradientColor1, gradientColor2, gradientColor3, gradientColor4, gradientColor5}
