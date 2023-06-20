@@ -16,6 +16,7 @@ import UpdateAttributes from './tool_components/UpdateAttributes';
 import PlayAudio from './tool_components/PlayAudio';
 import LoadProject from './tool_components/LoadProject';
 import RescanSource from './tool_components/RescanSource';
+import ExportSingle from './tool_components/ExportSingle';
 
 
 const drawerWidth = 400;
@@ -69,6 +70,7 @@ function App() {
     <ToolContext.Provider value={{
       typeNames,
       modelNames,
+      projectName,
       tagList,
       toolParams,
       setTypeNames,
@@ -158,6 +160,7 @@ function App() {
                 {activeTool === 'details' && <ViewDetails />}
                 {activeTool === 'updateAttributes' && <UpdateAttributes />}
                 {activeTool === 'playAudio' && <PlayAudio />}
+                {activeTool === 'exportSingle' && <ExportSingle />}
               </div>
             )}
           </Box>

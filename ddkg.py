@@ -12,6 +12,7 @@ data_file = 'ddkg.json'
 model_dir = 'models'
 audio_dir = 'audio'
 backups = 'backup'
+export = 'export'
 
 
 def check_dir(dir):
@@ -25,6 +26,7 @@ class DDKnowledgeGraph():
         self.root = Path(data_path)
         self.backend = backend
         self.G = nx.DiGraph()
+        self.project_name = None
         self.load()
 
     # IO functions
@@ -33,12 +35,20 @@ class DDKnowledgeGraph():
 
         if os.path.exists(self.root / data_file):
             with open(self.root / data_file, 'r') as df:
-                self.G = nx.cytoscape.cytoscape_graph(json.load(df))
+                data = json.load(df)
+                self.project_name = data['project_name']
+                self.export_target = Path(data['export_target'])
+                self.G = nx.cytoscape.cytoscape_graph(data['graph'])
 
     def save(self):
         os.system(f'cp {self.root / data_file} {check_dir(self.root / backups) / data_file}_{int(time())}')
         with open(self.root / data_file, 'w') as df:
-            df.write(json.dumps(nx.cytoscape.cytoscape_data(self.G), indent=4))
+            data = {
+                'project_name': self.project_name,
+                'export_target': str(self.export_target),
+                'graph': nx.cytoscape.cytoscape_data(self.G)
+            }
+            df.write(json.dumps(data, indent=4))
 
     def to_json(self):
         return nx.cytoscape.cytoscape_data(self.G)
@@ -290,4 +300,12 @@ class DDKnowledgeGraph():
         nx.function.set_node_attributes(self.G, {name: attrs})
         self.save()
 
-        # TODO: Handle non-node elements
+    # Export a single audio file
+    def export_single(
+            self,
+            name: str,
+            export_name: str,
+    ):
+        audio_path = self.root / self.G.nodes[name]['path']
+        target_path = check_dir(self.root / export) / f'{export_name}{audio_path.suffix}'
+        os.system(f'cp {audio_path} {target_path}')

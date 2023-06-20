@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
+import os
 import torch
 from pathlib import Path
 
@@ -80,6 +81,15 @@ def get_graph():
 def get_audio():
     path = (ddkg.root / ddkg.G.nodes[request.args.get('name')]['path']).resolve()
     return send_file(str(path))
+
+# Copy an audio file to a new folder for easier access
+@app.route('/export-single', methods=['POST'])
+def export_single():
+    ddkg.export_single(
+        name=request.form['name'],
+        export_name=request.form['export_name']
+    )
+    return jsonify({'message': 'success'})
 
 
 # -----------------------

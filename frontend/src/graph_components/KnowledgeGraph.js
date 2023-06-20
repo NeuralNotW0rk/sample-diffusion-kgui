@@ -169,7 +169,7 @@ function KnowledgeGraph({ pendingRefresh }) {
                     }
                 },
                 {
-                    content: 'Edit',
+                    content: 'Label',
                     select: function (ele) {
                         setActiveTool('updateAttributes');
 
@@ -181,6 +181,15 @@ function KnowledgeGraph({ pendingRefresh }) {
                     content: 'Variation',
                     select: function (ele) {
                         setActiveTool('variation');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
+                {
+                    content: 'Export',
+                    select: function (ele) {
+                        setActiveTool('exportSingle');
 
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
