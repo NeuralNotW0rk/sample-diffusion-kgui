@@ -6,18 +6,18 @@ import { CreateNewFolder, FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons
 
 //import './App.css';
 
-import KnowledgeGraph from './graph_components/KnowledgeGraph';
-import ViewDetails from './tool_components/ViewDetails';
-import ImportModel from './tool_components/ImportModel';
-import ExternalSource from './tool_components/ExternalSource';
-import Generation from './tool_components/Generation';
-import Variation from './tool_components/Variation';
-import UpdateAttributes from './tool_components/UpdateAttributes';
-import PlayAudio from './tool_components/PlayAudio';
-import LoadProject from './tool_components/LoadProject';
-import RescanSource from './tool_components/RescanSource';
-import ExportSingle from './tool_components/ExportSingle';
-import BatchUpdateAttributes from './tool_components/BatchUpdateAttributes';
+import KnowledgeGraph from './graph-components/KnowledgeGraph';
+import ViewDetails from './tool-components/ViewDetails';
+import ImportModel from './tool-components/ImportModel';
+import ExternalSource from './tool-components/ExternalSource';
+import Generation from './tool-components/Generation';
+import Variation from './tool-components/Variation';
+import UpdateAttributes from './tool-components/UpdateAttributes';
+import PlayAudio from './tool-components/PlayAudio';
+import LoadProject from './tool-components/LoadProject';
+import RescanSource from './tool-components/RescanSource';
+import ExportSingle from './tool-components/ExportSingle';
+import BatchUpdateAttributes from './tool-components/BatchUpdateAttributes';
 
 
 const drawerWidth = 400;

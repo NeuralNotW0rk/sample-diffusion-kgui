@@ -8,6 +8,7 @@ import expandCollapse from 'cytoscape-expand-collapse';
 import defaultStyle from './Style';
 import defaultLayout from './Layout';
 import defaultOptions from './Options';
+import CustomTiling from './Tiling';
 
 import { ToolContext } from "../App";
 
@@ -354,39 +355,28 @@ function KnowledgeGraph({ pendingRefresh }) {
     //  LAYOUT FUNCTIONS
     // ------------------
 
-    function customTile() {
-        const cy = cytoscapeInstanceRef.current;
-        const parents = cy.nodes('[type = "batch"], [type = "set"]');
-        const alignment = {
-            vertical:
-                parents.map( (parent) => {
-                    return cy.nodes(`[parent = "${parent.data('id')}"]`).map((child) => {
-                        return child.data('id');
-                    });
-                }),
-            horizontal: []
-        };
-        console.log(alignment);
-        return alignment;
-    }
-
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
-        customTile();
+
+        // Workaround tiling issues by temporarily removing audio source edges
+        var audioSourceEdges = cy.edges('[type="audio_source"]').remove();
+
+        // Create and run layout
         var layout = cy.layout({
             ...defaultLayout,
             randomize,
-            //alignmentConstraint: customTile(),
             tilingCompareBy: (nodeId1, nodeId2) => {
                 if (cy.$id(nodeId1).data('type') === 'audio' && cy.$id(nodeId2).data('type') === 'audio') {
                     return cy.$id(nodeId1).data('batch_index') - cy.$id(nodeId2).data('batch_index');
                 };
                 return 0;
             },
-            
-        });
 
+        });
         layout.run();
+
+        // Restore removed elements
+        audioSourceEdges.restore();
     };
 
     // -----------
