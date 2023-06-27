@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
+import layoutUtilities from 'cytoscape-layout-utilities';
 import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu';
 import expandCollapse from 'cytoscape-expand-collapse';
@@ -10,6 +11,7 @@ import defaultOptions from './Options';
 
 import { ToolContext } from "../App";
 
+cytoscape.use(layoutUtilities);
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
@@ -141,7 +143,16 @@ function KnowledgeGraph({ pendingRefresh }) {
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
                     }
-                }
+                },
+                {
+                    content: 'Label',
+                    select: function (ele) {
+                        setActiveTool('batchUpdateAttributes');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
             ]
         });
 
@@ -343,14 +354,36 @@ function KnowledgeGraph({ pendingRefresh }) {
     //  LAYOUT FUNCTIONS
     // ------------------
 
+    function customTile() {
+        const cy = cytoscapeInstanceRef.current;
+        const parents = cy.nodes('[type = "batch"], [type = "set"]');
+        const alignment = {
+            vertical:
+                parents.map( (parent) => {
+                    return cy.nodes(`[parent = "${parent.data('id')}"]`).map((child) => {
+                        return child.data('id');
+                    });
+                }),
+            horizontal: []
+        };
+        console.log(alignment);
+        return alignment;
+    }
+
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
+        customTile();
         var layout = cy.layout({
             ...defaultLayout,
             randomize,
+            //alignmentConstraint: customTile(),
             tilingCompareBy: (nodeId1, nodeId2) => {
-                return cy.$id(nodeId1).data('batch_idx') - cy.$id(nodeId2).data('batch_idx');
-            }
+                if (cy.$id(nodeId1).data('type') === 'audio' && cy.$id(nodeId2).data('type') === 'audio') {
+                    return cy.$id(nodeId1).data('batch_index') - cy.$id(nodeId2).data('batch_index');
+                };
+                return 0;
+            },
+            
         });
 
         layout.run();

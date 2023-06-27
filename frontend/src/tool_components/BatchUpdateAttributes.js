@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled} from '@mui/material';
+import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled, Checkbox, FormControlLabel } from '@mui/material';
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import './Tools.css';
 
@@ -14,28 +14,34 @@ const StyledRating = styled(Rating)(({ theme }) => ({
 
 const customIcons = {
     1: {
-        icon: <Favorite style={{color: '#002254'}} />,
+        icon: <Favorite style={{ color: '#002254' }} />,
         label: 'Unuseable',
     },
     2: {
-        icon: <Favorite style={{color: '#004294'}} />,
+        icon: <Favorite style={{ color: '#004294' }} />,
         label: 'Barely useable',
     },
     3: {
-        icon: <Favorite style={{color: '#5b3285'}} />,
+        icon: <Favorite style={{ color: '#5b3285' }} />,
         label: 'Works',
     },
     4: {
-        icon: <Favorite style={{color: '#7e1b6a'}} />,
+        icon: <Favorite style={{ color: '#7e1b6a' }} />,
         label: 'Works well',
     },
     5: {
-        icon: <Favorite style={{color: '#8f004a'}} />,
+        icon: <Favorite style={{ color: '#8f004a' }} />,
         label: 'Favorite',
     },
 };
 
-function UpdateAttributes() {
+function IconContainer(props) {
+    const { value, ...other } = props;
+    return <span {...other}>{customIcons[value].icon}</span>;
+}
+
+
+function BatchUpdateAttributes() {
 
     const { toolParams, tagList, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
@@ -43,14 +49,14 @@ function UpdateAttributes() {
     const [hoverRating, setHoverRating] = useState(-1);
 
     const [alias, setAlias] = useState('');
-    const [caption, setCaption] = useState('');
+    const [applyChildAlias, setApplyChildAlias] = useState(false);
     const [selectedTags, setSelectedTags] = useState([]);
     const [tagOptions, setTagOptions] = useState([]);
 
     useEffect(() => {
         setAlias(toolParams.nodeData.alias || '');
+        setApplyChildAlias(false);
         setRating(toolParams.nodeData.rating || null);
-        setCaption(toolParams.nodeData.caption || '');
         setSelectedTags([]);
         toolParams.nodeData.tags && setSelectedTags(toolParams.nodeData.tags.split(','));
         setTagOptions(tagList.map((option) => {
@@ -64,7 +70,8 @@ function UpdateAttributes() {
         const form = e.target;
         const formData = new FormData(form);
 
-        formData.append('name', toolParams.nodeData.name)
+        formData.append('name', toolParams.nodeData.name);
+        formData.append('apply_child_alias', applyChildAlias);
         formData.append('tags', selectedTags);
         formData.append('rating', rating);
         
@@ -72,7 +79,7 @@ function UpdateAttributes() {
         formData.get('caption') === '' && formData.delete('caption');
 
         setAwaitingResponse(true);
-        fetch('/update-element', {
+        fetch('/update-batch', {
             method: 'POST',
             body: formData
         })
@@ -96,11 +103,11 @@ function UpdateAttributes() {
             spacing={2}
             alignItems="center"
         >
-            <Typography variant="h6">Update Attributes</Typography>
+            <Typography variant="h6">Update Batch Attributes</Typography>
             <TextField
                 name="name"
                 value={toolParams.nodeData.name}
-                label="Sample name"
+                label="Batch name"
                 disabled
             />
             <TextField
@@ -109,18 +116,15 @@ function UpdateAttributes() {
                 onChange={(e) => setAlias(e.target.value)}
                 label="Alias"
             />
-            <StyledRating
-                name="hover-feedback"
-                value={rating}
-                getLabelText={(value) => customIcons[value].label}
-                onChange={(event, newRating) => {
-                    setRating(newRating);
-                }}
-                onChangeActive={(event, newHoverRating) => {
-                    setHoverRating(newHoverRating);
-                }}
-                icon={customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].icon : null}
-                emptyIcon={<FavoriteBorder fontSize="inherit" />}
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={applyChildAlias}
+                        onChange={(e) => setApplyChildAlias(e.target.checked)}
+                        defaultChecked={false}
+                    />
+                }
+                label="Apply alias to children"
             />
             <Box sx={{ ml: 2 }}>{customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].label : null}</Box>
             <Autocomplete
@@ -145,12 +149,6 @@ function UpdateAttributes() {
                 )}
 
             />
-            <TextField
-                name="caption"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                label="Caption"
-            />
             <ButtonGroup variant="contained" >
                 <Button type="reset">Default</Button>
                 <Button type="submit">Update</Button>
@@ -159,4 +157,4 @@ function UpdateAttributes() {
     );
 };
 
-export default UpdateAttributes;
+export default BatchUpdateAttributes;

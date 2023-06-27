@@ -17,6 +17,7 @@ import PlayAudio from './tool_components/PlayAudio';
 import LoadProject from './tool_components/LoadProject';
 import RescanSource from './tool_components/RescanSource';
 import ExportSingle from './tool_components/ExportSingle';
+import BatchUpdateAttributes from './tool_components/BatchUpdateAttributes';
 
 
 const drawerWidth = 400;
@@ -159,6 +160,7 @@ function App() {
                 {activeTool === 'variation' && <Variation />}
                 {activeTool === 'details' && <ViewDetails />}
                 {activeTool === 'updateAttributes' && <UpdateAttributes />}
+                {activeTool === 'batchUpdateAttributes' && <BatchUpdateAttributes />}
                 {activeTool === 'playAudio' && <PlayAudio />}
                 {activeTool === 'exportSingle' && <ExportSingle />}
               </div>

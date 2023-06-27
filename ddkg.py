@@ -229,7 +229,7 @@ class DDKnowledgeGraph():
         batch_name = f'batch_{sample_prefix}'
         self.G.add_node(
             batch_name,
-            alias=batch_name[-10:],
+            alias=f'{model_name[:3]}_{batch_name[-10:]}',
             type='batch',
             created=current_time
         )
@@ -260,8 +260,8 @@ class DDKnowledgeGraph():
         batch_dir = check_dir(self.root / audio_dir / mode / model_name)
         for i, sample in enumerate(output):
             # Save audio
-            batch_idx = i + 1
-            audio_name = f'sample_{sample_prefix}_{batch_idx}'
+            batch_index = i + 1
+            audio_name = f'sample_{sample_prefix}_{batch_index}'
             audio_path = batch_dir / f'{audio_name}.wav'
             open(str(audio_path), 'a').close()
             torchaudio.save(str(audio_path), sample.cpu(), sample_rate)
@@ -269,8 +269,8 @@ class DDKnowledgeGraph():
             # Create node
             self.G.add_node(
                 audio_name,
-                alias=audio_name[-12:],
-                batch_index=batch_idx,
+                alias=f'{model_name[:3]}_{batch_name[-10:]}_{batch_index}',
+                batch_index=batch_index,
                 type='audio',
                 path=str(audio_path.relative_to(self.root)),
                 sample_rate=sample_rate,
@@ -298,6 +298,32 @@ class DDKnowledgeGraph():
             attrs: dict
     ):
         nx.function.set_node_attributes(self.G, {name: attrs})
+        self.save()
+
+    # Slightly less simple batch attribute update
+    def update_batch(
+            self,
+            name: str,
+            attrs: dict
+    ):
+        if 'alias' in attrs:
+            # Update batch alias
+            nx.function.set_node_attributes(self.G, {name: {'alias': attrs['alias']}})
+            if attrs['apply_child_alias']:
+                # Update all children aliases
+                for node, data in self.G.nodes(data=True):
+                    if data.get('parent') == name:
+                        new_alias = f'{attrs["alias"]}_{data["batch_index"]}'
+                        self.G.nodes[node]['alias'] = new_alias
+
+        if 'tags' in attrs and attrs['tags'] != '':
+            # Add tags to child tag lists
+            for node, data in self.G.nodes(data=True):
+                if data.get('parent') == name:
+                    delim = ','
+                    new_tags = delim.join(set(data['tags'].split(delim)) | set(attrs['tags'].split(delim)))
+                    self.G.nodes[node]["tags"] = new_tags
+            
         self.save()
 
     # Export a single audio file

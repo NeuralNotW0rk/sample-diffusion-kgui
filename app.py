@@ -204,6 +204,14 @@ def update_element():
     )
     return jsonify({'message': 'success'})
 
+@app.route('/update-batch', methods=['POST'])
+def update_batch():
+    ddkg.update_batch(
+        request.form['name'],
+        dict(request.form)
+    )
+    return jsonify({'message': 'success'})
+
 @app.route('/remove-element', methods=['POST'])
 def remove_element():
     pass
