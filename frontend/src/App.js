@@ -1,8 +1,8 @@
 
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import { CreateNewFolder, FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
+import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
 
 //import './App.css';
 
@@ -13,7 +13,6 @@ import ExternalSource from './tool-components/ExternalSource';
 import Generation from './tool-components/Generation';
 import Variation from './tool-components/Variation';
 import UpdateAttributes from './tool-components/UpdateAttributes';
-import PlayAudio from './tool-components/PlayAudio';
 import LoadProject from './tool-components/LoadProject';
 import RescanSource from './tool-components/RescanSource';
 import ExportSingle from './tool-components/ExportSingle';
@@ -161,13 +160,12 @@ function App() {
                 {activeTool === 'details' && <ViewDetails />}
                 {activeTool === 'updateAttributes' && <UpdateAttributes />}
                 {activeTool === 'batchUpdateAttributes' && <BatchUpdateAttributes />}
-                {activeTool === 'playAudio' && <PlayAudio />}
                 {activeTool === 'exportSingle' && <ExportSingle />}
               </div>
             )}
           </Box>
         </Drawer>
-        <Box height='90%' flex='1'>
+        <Box flex='1' overflow='hidden' >
           <Toolbar />
           <KnowledgeGraph pendingRefresh={pendingRefresh} />
         </Box>

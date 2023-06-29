@@ -1,5 +1,5 @@
-const gradientColor1 = '#002254' // Blue
-const gradientColor2 = '#004294' // Purple
+const gradientColor1 = '#002254'
+const gradientColor2 = '#004294'
 const gradientColor3 = '#5b3285'
 const gradientColor4 = '#7e1b6a'
 const gradientColor5 = '#8f004a'
@@ -26,7 +26,8 @@ const defaultStyle = [
             'color': 'white',
             'edge-text-rotation': 'autorotate',
             'curve-style': 'straight',
-            'target-arrow-shape': 'triangle'
+            'target-arrow-shape': 'triangle',
+            'z-compound-depth': 'bottom',
         },
     },
 
