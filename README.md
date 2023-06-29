@@ -5,6 +5,17 @@ The motivation is both to make an interactive ui for using dd models and provide
 
 This is an early prototype, so expect bugs and major changes
 
+## Overview
+![Example workflow](docs/example.png)
+Right-clicking on the graph view and its elements will bring up a radial context menu.
+Elements can be dragged around and automatically arranged using [fCoSE](https://github.com/iVis-at-Bilkent/cytoscape.js-fcose)
+- Purple nodes: models
+- Cyan nodes: audio samples
+- Boxes: output batches
+- Blue nodes: External audio source directory
+- Arrows: generation (dashed lines are for variation - purple from the model and blue from the audio source)
+
+
 ## Features
 
 - Dance diffusion generation and variation

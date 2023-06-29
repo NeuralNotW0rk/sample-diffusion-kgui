@@ -137,9 +137,9 @@ function App() {
         >
           <Toolbar />
           <Box sx={{ overflow: 'auto'}}>
-            <Typography variant="h4" component="div" align='center'>
+            <Typography variant="h6" component="div" align='center'>
               {projectName ? (
-                projectName
+                "Project: " + projectName
               ) : (
                 "No project selected"
               )}
