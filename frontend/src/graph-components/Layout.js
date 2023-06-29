@@ -1,5 +1,3 @@
-
-
 const defaultLayout = {
     name: 'fcose',
     // 'draft', 'default' or 'proof' 

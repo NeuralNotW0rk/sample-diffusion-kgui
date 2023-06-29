@@ -1,22 +1,22 @@
 
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Button, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import { CreateNewFolder, FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
+import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
 
 //import './App.css';
 
-import KnowledgeGraph from './graph_components/KnowledgeGraph';
-import ViewDetails from './tool_components/ViewDetails';
-import ImportModel from './tool_components/ImportModel';
-import ExternalSource from './tool_components/ExternalSource';
-import Generation from './tool_components/Generation';
-import Variation from './tool_components/Variation';
-import UpdateAttributes from './tool_components/UpdateAttributes';
-import PlayAudio from './tool_components/PlayAudio';
-import LoadProject from './tool_components/LoadProject';
-import RescanSource from './tool_components/RescanSource';
-import ExportSingle from './tool_components/ExportSingle';
+import KnowledgeGraph from './graph-components/KnowledgeGraph';
+import ViewDetails from './tool-components/ViewDetails';
+import ImportModel from './tool-components/ImportModel';
+import ExternalSource from './tool-components/ExternalSource';
+import Generation from './tool-components/Generation';
+import Variation from './tool-components/Variation';
+import UpdateAttributes from './tool-components/UpdateAttributes';
+import LoadProject from './tool-components/LoadProject';
+import RescanSource from './tool-components/RescanSource';
+import ExportSingle from './tool-components/ExportSingle';
+import BatchUpdateAttributes from './tool-components/BatchUpdateAttributes';
 
 
 const drawerWidth = 400;
@@ -137,9 +137,9 @@ function App() {
         >
           <Toolbar />
           <Box sx={{ overflow: 'auto'}}>
-            <Typography variant="h4" component="div" align='center'>
+            <Typography variant="h6" component="div" align='center'>
               {projectName ? (
-                projectName
+                "Project: " + projectName
               ) : (
                 "No project selected"
               )}
@@ -159,13 +159,13 @@ function App() {
                 {activeTool === 'variation' && <Variation />}
                 {activeTool === 'details' && <ViewDetails />}
                 {activeTool === 'updateAttributes' && <UpdateAttributes />}
-                {activeTool === 'playAudio' && <PlayAudio />}
+                {activeTool === 'batchUpdateAttributes' && <BatchUpdateAttributes />}
                 {activeTool === 'exportSingle' && <ExportSingle />}
               </div>
             )}
           </Box>
         </Drawer>
-        <Box height='90%' flex='1'>
+        <Box flex='1' overflow='hidden' >
           <Toolbar />
           <KnowledgeGraph pendingRefresh={pendingRefresh} />
         </Box>

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import cytoscape from 'cytoscape';
+import layoutUtilities from 'cytoscape-layout-utilities';
 import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu';
 import expandCollapse from 'cytoscape-expand-collapse';
@@ -9,18 +10,24 @@ import defaultLayout from './Layout';
 import defaultOptions from './Options';
 
 import { ToolContext } from "../App";
+import { Divider, Stack, Typography } from '@mui/material';
 
+cytoscape.use(layoutUtilities);
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
 
 function KnowledgeGraph({ pendingRefresh }) {
     const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setProjectName, setModelNames, setTagList } = useContext(ToolContext);
+    const audioContext = new AudioContext({ latencyHint: 'playback' })
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
+
+    const [currentSample, setCurrentSample] = useState(null);
+    const audioRef = useRef(null);
 
     // -----------------
     //  COMPONENT SETUP
@@ -77,7 +84,6 @@ function KnowledgeGraph({ pendingRefresh }) {
             var node = this;
             node.data('isExpanded', true);
         });
-
 
         // Core component
         cy.cxtmenu({
@@ -141,7 +147,16 @@ function KnowledgeGraph({ pendingRefresh }) {
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
                     }
-                }
+                },
+                {
+                    content: 'Label',
+                    select: function (ele) {
+                        setActiveTool('batchUpdateAttributes');
+
+                        const nodeData = ele.json().data;
+                        setToolParams({ nodeData });
+                    }
+                },
             ]
         });
 
@@ -154,15 +169,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                     content: 'Details',
                     select: function (ele) {
                         setActiveTool('details');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
-                {
-                    content: 'Play',
-                    select: function (ele) {
-                        setActiveTool('playAudio');
 
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
@@ -301,9 +307,13 @@ function KnowledgeGraph({ pendingRefresh }) {
             // Apply layout if number of nodes has changed
             cy.nodes().length === positions.length || applyFcose();
 
-
             // Expand and collapse setup
             cy.$('node[type="batch"]').data('isExpanded', true);
+
+            // Audio select listener
+            cy.$('node[type="audio"]').on('select', (event) => {
+                setCurrentSample(event.target.data());
+            });
 
             // Retrieve model names
             setModelNames(cy.elements('node[type="model"]').map((ele) => {
@@ -345,25 +355,67 @@ function KnowledgeGraph({ pendingRefresh }) {
 
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
+
+        // Workaround tiling issues by temporarily removing audio source edges
+        var audioSourceEdges = cy.edges('[type="audio_source"]').remove();
+
+        // Create and run layout
         var layout = cy.layout({
             ...defaultLayout,
             randomize,
             tilingCompareBy: (nodeId1, nodeId2) => {
-                return cy.$id(nodeId1).data('batch_idx') - cy.$id(nodeId2).data('batch_idx');
-            }
-        });
+                if (cy.$id(nodeId1).data('type') === 'audio' && cy.$id(nodeId2).data('type') === 'audio') {
+                    return cy.$id(nodeId1).data('batch_index') - cy.$id(nodeId2).data('batch_index');
+                };
+                return 0;
+            },
 
+        });
         layout.run();
+
+        // Restore removed elements
+        audioSourceEdges.restore();
     };
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.src = `/audio?name=${currentSample.name}`;
+            audioRef.current.load();
+            audioRef.current.play();
+        }
+    }, [currentSample]);
 
     // -----------
     //  RENDERING
     // -----------
 
     return (
-            <div ref={cytoscapeContainerRef} style={{ width: '100%', height: '100%', textAlign: 'left' }} />
+        <div style={{ height: '95%', display: 'flex', flexDirection: 'column' }}>
+            <div
+                ref={cytoscapeContainerRef}
+                style={{ height: '90%' }}
+            />
+            <Divider />
+            <Stack
+                direction='row'
+                spacing={2}
+                alignItems='center'
+                justifyContent='center'
+                padding={1}
+            >
+                <Typography variant='h6'>
+                    {currentSample ? (
+                        currentSample.name
+                    ) : (
+                        'Click an audio node to listen'
+                    )}
+                </Typography>
+                {currentSample &&
+                    <audio ref={audioRef} controls />
+                }
+            </Stack>
+        </div>
     );
-
 };
 
 export default KnowledgeGraph

@@ -35,12 +35,6 @@ const customIcons = {
     },
 };
 
-function IconContainer(props) {
-    const { value, ...other } = props;
-    return <span {...other}>{customIcons[value].icon}</span>;
-}
-  
-
 function UpdateAttributes() {
 
     const { toolParams, tagList, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
@@ -128,9 +122,7 @@ function UpdateAttributes() {
                 icon={customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].icon : null}
                 emptyIcon={<FavoriteBorder fontSize="inherit" />}
             />
-            {rating !== null && (
-                <Box sx={{ ml: 2 }}>{customIcons[hoverRating !== -1 ? hoverRating : rating].label}</Box>
-            )}
+            <Box sx={{ ml: 2 }}>{customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].label : null}</Box>
             <Autocomplete
                 fullWidth
                 multiple
