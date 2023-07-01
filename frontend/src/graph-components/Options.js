@@ -1,7 +1,7 @@
 import defaultLayout from "./Layout";
 
 const defaultOptions = {
-    layoutBy: defaultLayout, // to rearrange after expand/collapse. It's just layout options or whole layout function. Choose your side!
+    layoutBy: undefined, // to rearrange after expand/collapse. It's just layout options or whole layout function. Choose your side!
     // recommended usage: use cose-bilkent layout with randomize: false to preserve mental map upon expand/collapse
     fisheye: false, // whether to perform fisheye view after expand/collapse you can specify a function too
     animate: false, // whether to animate on drawing changes you can specify a function too
@@ -9,7 +9,7 @@ const defaultOptions = {
     ready: function () { }, // callback when expand/collapse initialized
     undoable: false, // and if undoRedoExtension exists,
 
-    cueEnabled: true, // Whether cues are enabled
+    cueEnabled: false, // Whether cues are enabled
     expandCollapseCuePosition: 'top-left', // default cue position is top left you can specify a function per node too
     expandCollapseCueSize: 12, // size of expand-collapse cue
     expandCollapseCueLineSize: 8, // size of lines used for drawing plus-minus icons

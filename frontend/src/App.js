@@ -1,7 +1,7 @@
 
 import React, { createContext, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider, Autocomplete, TextField} from '@mui/material';
 import { FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
 
 //import './App.css';
@@ -17,13 +17,14 @@ import LoadProject from './tool-components/LoadProject';
 import RescanSource from './tool-components/RescanSource';
 import ExportSingle from './tool-components/ExportSingle';
 import BatchUpdateAttributes from './tool-components/BatchUpdateAttributes';
+import SearchAndFilter from './tool-components/SearchAndFilter';
 
 
 const drawerWidth = 400;
 
 const defaultTheme = createTheme({
   palette: {
-    mode: "dark",
+    mode: 'dark',
   },
   components: {
     MuiSelect: {
@@ -49,7 +50,7 @@ const ToolContext = createContext();
 function App() {
   const [projectName, setProjectName] = useState(null);
   const [typeNames, setTypeNames] = useState(null);
-  const [modelNames, setModelNames] = useState(null);
+  const [nodeNames, setNodeNames] = useState(null);
   const [tagList, setTagList] = useState(null);
 
   const [activeTool, setActiveTool] = useState('default')
@@ -69,12 +70,12 @@ function App() {
   return (<ThemeProvider theme={defaultTheme}>
     <ToolContext.Provider value={{
       typeNames,
-      modelNames,
+      nodeNames,
       projectName,
       tagList,
       toolParams,
       setTypeNames,
-      setModelNames,
+      setNodeNames,
       setTagList,
       setToolParams,
       setActiveTool,
@@ -84,18 +85,18 @@ function App() {
     }}>
       <Box height='100vh' display='flex' flexDirection='col'>
         <CssBaseline />
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <AppBar position='fixed' sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
             <IconButton
               aria-controls={open ? 'basic-menu' : undefined}
-              aria-haspopup="true"
+              aria-haspopup='true'
               aria-expanded={open ? 'true' : undefined}
               onClick={handleClick}
             >
               <MenuOpen />
             </IconButton>
             <Menu
-              id="basic-menu"
+              id='basic-menu'
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
@@ -108,7 +109,7 @@ function App() {
                 setPendingRefresh(true);
               }}>
                 <ListItemIcon>
-                  <Refresh fontSize="small" />
+                  <Refresh fontSize='small' />
                 </ListItemIcon>
                 <ListItemText>Refresh graph</ListItemText>
               </MenuItem>
@@ -117,18 +118,19 @@ function App() {
                 setActiveTool('loadProject');
               }}>
                 <ListItemIcon>
-                  <FolderOpen fontSize="small" />
+                  <FolderOpen fontSize='small' />
                 </ListItemIcon>
                 <ListItemText>Open</ListItemText>
               </MenuItem>
             </Menu>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant='h6' noWrap component='div'>
               Dance Diffusion KGUI
             </Typography>
           </Toolbar>
         </AppBar>
         <Drawer
-          variant="permanent"
+          variant='permanent'
+          anchor='left'
           sx={{
             width: drawerWidth,
             flexShrink: 0,
@@ -136,17 +138,17 @@ function App() {
           }}
         >
           <Toolbar />
-          <Box sx={{ overflow: 'auto'}}>
-            <Typography variant="h6" component="div" align='center'>
+          <Box sx={{ overflow: 'auto' }}>
+            <Typography variant='h6' component='div' align='center'>
               {projectName ? (
-                "Project: " + projectName
+                'Project: ' + projectName
               ) : (
-                "No project selected"
+                'No project selected'
               )}
             </Typography>
-            <Divider/>
+            <Divider />
             {awaitingResponse ? (
-              <Typography variant="h6" noWrap component="div">
+              <Typography variant='h6' noWrap component='div'>
                 Waiting for response...
               </Typography>
             ) : (
@@ -169,6 +171,22 @@ function App() {
           <Toolbar />
           <KnowledgeGraph pendingRefresh={pendingRefresh} />
         </Box>
+        {/*
+        <Drawer
+          variant='permanent'
+          anchor='right'
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          }}
+        >
+          <Toolbar />
+          <Box sx={{ overflow: 'auto' }}>
+            <SearchAndFilter />
+          </Box>
+        </Drawer>
+        */}
       </Box>
     </ToolContext.Provider>
   </ThemeProvider>
