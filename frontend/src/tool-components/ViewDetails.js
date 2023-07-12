@@ -18,14 +18,14 @@ function ViewDetails() {
                     <TableBody>
                         {Object.entries(toolParams.nodeData).map(([key, value]) => (
                             <TableRow
-                            key={key}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                            <TableCell component="th" scope="row">
-                                {key}
-                            </TableCell>
-                            <TableCell align="left">{value}</TableCell>
-                        </TableRow>
+                                key={key}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <TableCell component="th" scope="row">
+                                    {key}
+                                </TableCell>
+                                <TableCell align="left">{String(value)}</TableCell>
+                            </TableRow>
                         ))}
                     </TableBody>
                 </Table>

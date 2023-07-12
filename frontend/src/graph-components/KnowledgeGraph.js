@@ -1,28 +1,42 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import cytoscape from 'cytoscape';
 import layoutUtilities from 'cytoscape-layout-utilities';
 import fcose from 'cytoscape-fcose';
 import cxtmenu from 'cytoscape-cxtmenu';
 import expandCollapse from 'cytoscape-expand-collapse';
+import popper from 'cytoscape-popper';
 
 import defaultStyle from './Style';
 import defaultLayout from './Layout';
 import defaultOptions from './Options';
 
 import { ToolContext } from "../App";
-import { Divider, Stack, Typography } from '@mui/material';
+import { Button, Box, Divider, Stack, Typography } from '@mui/material';
 
 cytoscape.use(layoutUtilities);
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
+cytoscape.use(popper);
+
+const ReactButton = () => {
+    return <Button type="button">React Button</Button>;
+};
+
+const createContentFromComponent = (component) => {
+    const dummyDomEle = document.createElement('div');
+    ReactDOM.render(component, dummyDomEle);
+    document.body.appendChild(dummyDomEle);
+    return dummyDomEle;
+};
 
 function KnowledgeGraph({ pendingRefresh }) {
-    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setProjectName, setModelNames, setTagList } = useContext(ToolContext);
-    const audioContext = new AudioContext({ latencyHint: 'playback' })
+    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setNodeNames, setProjectName, setTagList } = useContext(ToolContext);
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
+    const cytoscapePopperRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
 
@@ -64,7 +78,6 @@ function KnowledgeGraph({ pendingRefresh }) {
         }
     };
 
-
     // Initialize graph
     useEffect(() => {
         // Initialize Cytoscape.js instance and attach it to the container
@@ -75,24 +88,20 @@ function KnowledgeGraph({ pendingRefresh }) {
         cytoscapeInstanceRef.current = cy;
 
         cy.expandCollapse(defaultOptions);
+        var expCol = cy.expandCollapse('get');
 
-        cy.nodes().on('expandcollapse.beforecollapse', function () {
-            var node = this;
-            node.data('isExpanded', false);
-        });
-        cy.nodes().on('expandcollapse.beforeexpand', function () {
-            var node = this;
-            node.data('isExpanded', true);
-        });
+        // ----------------------------
+        //  Context menu configuration 
+        // ----------------------------
 
         // Core component
         cy.cxtmenu({
             selector: 'core',
             commands: [
                 {
-                    content: 'Shuffle',
+                    content: 'Tidy',
                     select: function () {
-                        applyFcose(true);
+                        applyFcose(false);
                     }
                 },
                 {
@@ -109,24 +118,28 @@ function KnowledgeGraph({ pendingRefresh }) {
                 },
             ]
         });
+        const elementCommands = [
+            {
+                content: 'Details',
+                select: function (ele) {
+                    setActiveTool('details');
+
+                    const nodeData = ele.json().data;
+                    console.log(nodeData);
+                    setToolParams({ nodeData });
+                }
+            }
+        ];
 
         // Model nodes
         cy.cxtmenu({
             selector: 'node[type="model"]',
             commands: [
+                ...elementCommands,
                 {
                     content: 'Generate',
                     select: function (ele) {
                         setActiveTool('generation');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
-                {
-                    content: 'Details',
-                    select: function (ele) {
-                        setActiveTool('details');
 
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
@@ -136,27 +149,43 @@ function KnowledgeGraph({ pendingRefresh }) {
         });
 
         // Batch nodes
+        const batchCommands = [
+            {
+                content: 'Label',
+                select: function (ele) {
+                    setActiveTool('batchUpdateAttributes');
+
+                    const nodeData = ele.json().data;
+                    setToolParams({ nodeData });
+                }
+            },
+        ]
         cy.cxtmenu({
             selector: 'node[type="batch"][?isExpanded]',
             commands: [
+                ...elementCommands,
+                ...batchCommands,
                 {
-                    content: 'Details',
+                    content: 'Collapse',
                     select: function (ele) {
-                        setActiveTool('details');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
+                        expCol.collapse(ele);
+                        ele.data('isExpanded', false);
                     }
-                },
+                }
+            ]
+        });
+        cy.cxtmenu({
+            selector: 'node[type="batch"][!isExpanded]',
+            commands: [
+                ...elementCommands,
+                ...batchCommands,
                 {
-                    content: 'Label',
+                    content: 'Expand',
                     select: function (ele) {
-                        setActiveTool('batchUpdateAttributes');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
+                        expCol.expand(ele);
+                        ele.data('isExpanded', true);
                     }
-                },
+                }
             ]
         });
 
@@ -165,15 +194,7 @@ function KnowledgeGraph({ pendingRefresh }) {
         cy.cxtmenu({
             selector: 'node[type="audio"]',
             commands: [
-                {
-                    content: 'Details',
-                    select: function (ele) {
-                        setActiveTool('details');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
+                ...elementCommands,
                 {
                     content: 'Label',
                     select: function (ele) {
@@ -208,15 +229,7 @@ function KnowledgeGraph({ pendingRefresh }) {
         cy.cxtmenu({
             selector: 'edge',
             commands: [
-                {
-                    content: 'Details',
-                    select: function (ele) {
-                        setActiveTool('details');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
+                ...elementCommands,
             ]
         });
 
@@ -224,19 +237,11 @@ function KnowledgeGraph({ pendingRefresh }) {
         cy.cxtmenu({
             selector: 'node[type="model"]',
             commands: [
+                ...elementCommands,
                 {
                     content: 'Generate',
                     select: function (ele) {
                         setActiveTool('generation');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
-                {
-                    content: 'Details',
-                    select: function (ele) {
-                        setActiveTool('details');
 
                         const nodeData = ele.json().data;
                         setToolParams({ nodeData });
@@ -249,15 +254,7 @@ function KnowledgeGraph({ pendingRefresh }) {
         cy.cxtmenu({
             selector: 'node[type="external"]',
             commands: [
-                {
-                    content: 'Details',
-                    select: function (ele) {
-                        setActiveTool('details');
-
-                        const nodeData = ele.json().data;
-                        setToolParams({ nodeData });
-                    }
-                },
+                ...elementCommands,
                 {
                     content: 'Rescan',
                     select: function (ele) {
@@ -269,6 +266,14 @@ function KnowledgeGraph({ pendingRefresh }) {
                 }
             ]
         });
+
+        // ----------------------
+        //  Popper configuration
+        // ----------------------
+
+        // -----------------------
+        //  Fetch additional data
+        // -----------------------
 
         fetchTypeNames();
         fetchProjectName();
@@ -315,10 +320,15 @@ function KnowledgeGraph({ pendingRefresh }) {
                 setCurrentSample(event.target.data());
             });
 
-            // Retrieve model names
-            setModelNames(cy.elements('node[type="model"]').map((ele) => {
-                return ele.data('name');
-            }));
+            // Retrieve node names (keyed by node type)
+            var nodeMap = {}
+            cy.nodes().forEach((ele) => {
+                if (!nodeMap.hasOwnProperty(ele.data('type'))) {
+                    nodeMap[ele.data('type')] = [];
+                }
+                nodeMap[ele.data('type')].push(ele.data('name'));
+            });
+            setNodeNames(nodeMap);
 
             // Create a list of existing tags sorted by frequency
             var tagCounts = {};
@@ -346,6 +356,48 @@ function KnowledgeGraph({ pendingRefresh }) {
                 setToolParams({ nodeData });
             };
 
+
+            cy.nodes().on('mouseover', (event) => {
+                cytoscapePopperRef.current = event.target.popper({
+                    content: createContentFromComponent(<ReactButton />),
+                    popper: {
+                        placement: 'right',
+                        removeOnDestroy: true,
+                    },
+                });
+            });
+
+            cy.nodes().on('mouseout', () => {
+                if (cytoscapePopperRef) {
+                    cytoscapePopperRef.current.destroy();
+                }
+            });
+
+            /*
+            cy.$id('ivq (1)').popper(
+                {
+                    content: () => {
+                        console.log('boop');
+                        const jsxContent = (
+                            <Box sx={{ zIndex: 9999 }}>
+                                <Typography variant='p1'>
+                                    Hello there
+                                </Typography>
+                            </Box>
+                        );
+
+                        return ReactDOMServer.renderToString(jsxContent);
+                    },
+                }
+            );
+            */
+
+            cy.$id('ivq (1)').popper({
+                content: (node) => {
+                    // Return the tooltip content for each node
+                    return `<div>hewllosf thesaf</div>`;
+                }
+            });
         }
     }, [graphData]);
 

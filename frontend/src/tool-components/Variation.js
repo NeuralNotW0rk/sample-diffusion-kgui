@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
 import { ToolContext } from "../App";
@@ -10,14 +10,14 @@ function Variation() {
 
     const {
         typeNames,
-        modelNames,
+        nodeNames,
         toolParams,
         setAwaitingResponse,
         setPendingRefresh
     } = useContext(ToolContext);
     const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size || '65536');
     const [resample, setResample] = useState(true);
-    const [selectedModel, setSelectedModel] = useState(modelNames[0]);
+    const [selectedModel, setSelectedModel] = useState(nodeNames.model[0]);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
 
@@ -79,7 +79,7 @@ function Variation() {
                     value={selectedModel}
                     onChange={event => setSelectedModel(event.target.value)}
                 >
-                    {modelNames.map(option => (
+                    {nodeNames.model.map(option => (
                         <MenuItem value={option}>{option}</MenuItem>
                     ))}
                 </Select>
