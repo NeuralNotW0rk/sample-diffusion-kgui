@@ -11,7 +11,7 @@ from dance_diffusion.api import RequestHandler, Request, RequestType, ModelType
 from diffusion_library.sampler import SamplerType
 from diffusion_library.scheduler import SchedulerType
 
-from ddkg import DDKnowledgeGraph
+from audio_graph.ddkg import DDKnowledgeGraph
 
 PROJECT_DIR = Path('projects')
 
