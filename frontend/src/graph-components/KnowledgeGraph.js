@@ -36,7 +36,7 @@ function KnowledgeGraph({ pendingRefresh }) {
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
-    const cytoscapePopperRef = useRef(null);
+    //const cytoscapePopperRef = useRef(null);
 
     const [graphData, setGraphData] = useState(null);
 
@@ -267,10 +267,6 @@ function KnowledgeGraph({ pendingRefresh }) {
             ]
         });
 
-        // ----------------------
-        //  Popper configuration
-        // ----------------------
-
         // -----------------------
         //  Fetch additional data
         // -----------------------
@@ -356,7 +352,7 @@ function KnowledgeGraph({ pendingRefresh }) {
                 setToolParams({ nodeData });
             };
 
-
+            /*
             cy.nodes().on('mouseover', (event) => {
                 cytoscapePopperRef.current = event.target.popper({
                     content: createContentFromComponent(<ReactButton />),
@@ -372,32 +368,8 @@ function KnowledgeGraph({ pendingRefresh }) {
                     cytoscapePopperRef.current.destroy();
                 }
             });
-
-            /*
-            cy.$id('ivq (1)').popper(
-                {
-                    content: () => {
-                        console.log('boop');
-                        const jsxContent = (
-                            <Box sx={{ zIndex: 9999 }}>
-                                <Typography variant='p1'>
-                                    Hello there
-                                </Typography>
-                            </Box>
-                        );
-
-                        return ReactDOMServer.renderToString(jsxContent);
-                    },
-                }
-            );
             */
 
-            cy.$id('ivq (1)').popper({
-                content: (node) => {
-                    // Return the tooltip content for each node
-                    return `<div>hewllosf thesaf</div>`;
-                }
-            });
         }
     }, [graphData]);
 
