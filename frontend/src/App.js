@@ -147,7 +147,7 @@ function App() {
               )}
             </Typography>
             <Divider />
-            {awaitingResponse ? (
+            {false ? (
               <Typography variant='h6' noWrap component='div'>
                 Waiting for response...
               </Typography>

@@ -110,6 +110,7 @@ const defaultStyle = [
     {
         selector: 'edge[type="dd_generation"]',
         style: {
+            'label': 'data(seed)',
             'line-color': modelColor,
             'target-arrow-color': modelColor,
         }
@@ -117,6 +118,7 @@ const defaultStyle = [
     {
         selector: 'edge[type="dd_variation"]',
         style: {
+            'label': 'data(seed)',
             'line-color': modelColor,
             'target-arrow-color': modelColor,
             'line-style': 'dashed',

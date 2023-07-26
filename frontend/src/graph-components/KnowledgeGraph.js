@@ -18,7 +18,7 @@ cytoscape.use(layoutUtilities);
 cytoscape.use(fcose);
 cytoscape.use(cxtmenu);
 cytoscape.use(expandCollapse);
-cytoscape.use(popper);
+//cytoscape.use(popper);
 
 const ReactButton = () => {
     return <Button type="button">React Button</Button>;
@@ -119,6 +119,7 @@ function KnowledgeGraph({ pendingRefresh }) {
             ]
         });
         const elementCommands = [
+            /*
             {
                 content: 'Details',
                 select: function (ele) {
@@ -129,6 +130,7 @@ function KnowledgeGraph({ pendingRefresh }) {
                     setToolParams({ nodeData });
                 }
             }
+            */
         ];
 
         // Model nodes
@@ -311,9 +313,18 @@ function KnowledgeGraph({ pendingRefresh }) {
             // Expand and collapse setup
             cy.$('node[type="batch"]').data('isExpanded', true);
 
-            // Audio select listener
+            // Play audio on select
             cy.$('node[type="audio"]').on('select', (event) => {
                 setCurrentSample(event.target.data());
+            });
+
+            // Display element details on select
+            cy.$('*').on('select', (event) => {
+                setActiveTool('details');
+
+                const nodeData = event.target.data();
+                console.log(nodeData);
+                setToolParams({ nodeData });
             });
 
             // Retrieve node names (keyed by node type)
