@@ -36,13 +36,13 @@ function Variation() {
         formData.append('scheduler_type_name', selectedScheduler);
 
         setAwaitingResponse(true);
+        setActiveTool('default');
         fetch('/sd-request', {
             method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
-                setActiveTool('default');
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
                 console.log(data.message);

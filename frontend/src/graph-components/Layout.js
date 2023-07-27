@@ -23,7 +23,7 @@ const defaultLayout = {
     // Whether or not simple nodes (non-compound nodes) are of uniform dimensions
     uniformNodeDimensions: false,
     // Whether to pack disconnected components - cytoscape-layout-utilities extension should be registered and initialized
-    packComponents: true,
+    packComponents: false,
     // Layout step - all, transformed, enforced, cose - for debug purpose only
     step: "all",
     
@@ -45,7 +45,7 @@ const defaultLayout = {
     // Ideal edge (non nested) length
     idealEdgeLength: edge => 50,
     // Divisor to compute edge forces
-    edgeElasticity: edge => 0.45,
+    edgeElasticity: edge => 0.1,
     // Nesting factor (multiplier) to compute ideal edge length for nested edges
     nestingFactor: 0.1,
     // Maximum number of iterations to perform - this is a suggested value and might be adjusted by the algorithm as required

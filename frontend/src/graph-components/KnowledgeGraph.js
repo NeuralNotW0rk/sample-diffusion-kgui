@@ -450,7 +450,7 @@ function KnowledgeGraph({ pendingRefresh }) {
             >
                 <Typography variant='h6'>
                     {currentSample ? (
-                        currentSample.name
+                        currentSample.alias
                     ) : (
                         'Click an audio node to listen'
                     )}
