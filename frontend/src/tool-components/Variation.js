@@ -12,6 +12,7 @@ function Variation() {
         typeNames,
         nodeNames,
         toolParams,
+        setActiveTool,
         setAwaitingResponse,
         setPendingRefresh
     } = useContext(ToolContext);
@@ -41,6 +42,7 @@ function Variation() {
         })
             .then(response => response.json())
             .then(data => {
+                setActiveTool('default');
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
                 console.log(data.message);

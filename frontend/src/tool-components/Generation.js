@@ -8,7 +8,13 @@ function Generation() {
     const defaultSampler = 'V_IPLMS';
     const defaultScheduler = 'V_CRASH';
 
-    const { typeNames, toolParams, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
+    const {
+        typeNames,
+        toolParams,
+        setActiveTool,
+        setAwaitingResponse,
+        setPendingRefresh
+    } = useContext(ToolContext);
 
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
@@ -30,6 +36,7 @@ function Generation() {
         })
             .then(response => response.json())
             .then(data => {
+                setActiveTool('default');
                 setAwaitingResponse(false);
                 setPendingRefresh(true);
                 console.log(data.message);

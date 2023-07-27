@@ -129,8 +129,18 @@ function KnowledgeGraph({ pendingRefresh }) {
                     console.log(nodeData);
                     setToolParams({ nodeData });
                 }
-            }
+            },
             */
+            {
+                content: 'Remove',
+                select: function (ele) {
+                    setActiveTool('removeElement');
+
+                    const nodeData = ele.json().data;
+                    console.log(nodeData);
+                    setToolParams({ nodeData });
+                }
+            }
         ];
 
         // Model nodes

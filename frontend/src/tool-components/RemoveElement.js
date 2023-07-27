@@ -4,15 +4,9 @@ import './Tools.css';
 
 import { ToolContext } from "../App";
 
-function Remove() {
+function RemoveElement() {
 
-    const { toolParams, setAwaitingResponse } = useContext(ToolContext);
-
-    const [exportName, setExportName] = useState('');
-
-    useEffect(() => {
-        setExportName(toolParams.nodeData.alias || toolParams.nodeData.name);
-    }, [toolParams]);
+    const { toolParams, setActiveTool, setToolParams, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -23,13 +17,16 @@ function Remove() {
         formData.append('name', toolParams.nodeData.name);
 
         setAwaitingResponse(true);
-        fetch('/remove', {
+        fetch('/remove-element', {
             method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(data => {
+                setActiveTool('default');
+                setToolParams(null);
                 setAwaitingResponse(false);
+                setPendingRefresh(true);
                 console.log(data.message); // Success message from the server
             })
             .catch(error => {
@@ -46,13 +43,13 @@ function Remove() {
             spacing={2}
             alignItems="center"
         >
-            <Typography variant="h6">Remove</Typography>
+            <Typography variant="h6">Remove Element</Typography>
             <Typography variant="p1">Are you sure?</Typography>
             <ButtonGroup variant="contained" >
-                <Button type="submit">Export</Button>
+                <Button type="submit">Remove</Button>
             </ButtonGroup>
         </Stack>
     );
 };
 
-export default Remove;
+export default RemoveElement;

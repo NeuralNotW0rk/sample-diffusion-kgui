@@ -202,7 +202,6 @@ class DDKnowledgeGraph():
                     parent=set_name
                 )
 
-
     # Basic inference
     def log_inference(
             self,
@@ -324,6 +323,19 @@ class DDKnowledgeGraph():
                     new_tags = delim.join(set(data['tags'].split(delim)) | set(attrs['tags'].split(delim)))
                     self.G.nodes[node]["tags"] = new_tags
             
+        self.save()
+
+    # Remove element (and children in the case of batches)
+    def remove_element(
+            self,
+            name: str
+    ):
+        to_remove = [name]
+        for node, data in self.G.nodes(data=True):
+            if data.get('parent') == name:
+                to_remove.append(node)
+
+        self.G.remove_nodes_from(to_remove)
         self.save()
 
     # Export a single audio file

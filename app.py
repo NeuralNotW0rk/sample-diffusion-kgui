@@ -11,7 +11,7 @@ from dance_diffusion.api import RequestHandler, Request, RequestType, ModelType
 from diffusion_library.sampler import SamplerType
 from diffusion_library.scheduler import SchedulerType
 
-from kgui.ddkg import DDKnowledgeGraph
+from .kgui.ddkg import DDKnowledgeGraph
 
 PROJECT_DIR = Path('projects')
 
@@ -214,4 +214,7 @@ def update_batch():
 
 @app.route('/remove-element', methods=['POST'])
 def remove_element():
-    pass
+    ddkg.remove_element(
+        request.form['name']
+    )
+    return jsonify({'message': 'success'})

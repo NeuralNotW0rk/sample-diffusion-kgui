@@ -1,1 +1,1 @@
-from kgui import *
+from .kgui import *
