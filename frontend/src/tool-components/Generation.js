@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup } from '@mui/material';
+import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup, InputAdornment, IconButton } from '@mui/material';
+import { Autorenew, Shuffle } from '@mui/icons-material';
 import './Tools.css';
 
 import { ToolContext } from "../App";
@@ -16,8 +17,13 @@ function Generation() {
         setPendingRefresh
     } = useContext(ToolContext);
 
+    const [seed, setSeed] = useState(0);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
+
+    function randomizeSeed() {
+        setSeed(Math.floor(Math.random() * 4294967294));
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -26,6 +32,7 @@ function Generation() {
         const formData = new FormData(form);
         formData.append('mode', 'Generation');
         formData.append('model_name', toolParams.nodeData.name)
+        formData.append('seed', seed);
         formData.append('sampler_type_name', selectedSampler);
         formData.append('scheduler_type_name', selectedScheduler);
 
@@ -76,11 +83,22 @@ function Generation() {
                 inputProps={{ min: 1 }}
             />
             <TextField
-                name="seed"
+                value={seed}
+                onChange={(event) => setSeed(event.target.value)}
                 type="number"
-                defaultValue="0"
                 label="Seed"
                 inputProps={{ min: 0 }}
+                InputProps={{
+                    endAdornment: <InputAdornment posiion='end'>
+                        <IconButton
+                            aria-label='randomize'
+                            onClick={randomizeSeed}
+                            edge='end'
+                        >
+                            <Autorenew />
+                        </IconButton>
+                    </InputAdornment>
+                }}
             />
             <TextField
                 name="steps"

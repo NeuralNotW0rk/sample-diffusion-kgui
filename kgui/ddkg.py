@@ -5,18 +5,24 @@ from time import time
 import networkx as nx
 
 from .util import *
-from .importer import Importer
-from .exporter import Exporter
-from .inference import Inference
 
 
-class DDKnowledgeGraph(Importer, Exporter, Inference):
+class DDKnowledgeGraph:
     def __init__(self, data_path, backend=None, relative=True) -> None:
         self.root = Path(data_path)
         self.backend = backend
         self.G = nx.DiGraph()
         self.project_name = None
         self.load()
+
+    from ._import import (
+        import_model,
+        add_external_source,
+        scan_external_source,
+        import_audio_set,
+    )
+    from ._export import export_single, export_batch
+    from ._inference import log_inference
 
     # IO functions
     def load(self):
