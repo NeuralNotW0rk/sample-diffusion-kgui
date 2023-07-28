@@ -18,6 +18,7 @@ import RescanSource from './tool-components/RescanSource';
 import ExportSingle from './tool-components/ExportSingle';
 import BatchUpdateAttributes from './tool-components/BatchUpdateAttributes';
 import RemoveElement from './tool-components/RemoveElement';
+import ExportBatch from './tool-components/ExportBatch';
 
 
 const drawerWidth = 400;
@@ -163,6 +164,7 @@ function App() {
                 {activeTool === 'updateAttributes' && <UpdateAttributes />}
                 {activeTool === 'batchUpdateAttributes' && <BatchUpdateAttributes />}
                 {activeTool === 'exportSingle' && <ExportSingle />}
+                {activeTool === 'exportBatch' && <ExportBatch />}
                 {activeTool === 'removeElement' && <RemoveElement />}
               </div>
             )}

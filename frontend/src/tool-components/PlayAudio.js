@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
 import { Stack, Typography, Button, ButtonGroup } from '@mui/material';
-import './Tools.css';
 
 import { ToolContext } from '../App';
 

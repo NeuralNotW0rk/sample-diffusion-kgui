@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Stack, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
-import './Tools.css';
+import { Stack, Typography, TableContainer, Table, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 
 import { ToolContext } from '../App';
 

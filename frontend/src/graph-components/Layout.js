@@ -41,11 +41,11 @@ const defaultLayout = {
     /* incremental layout options */
     
     // Node repulsion (non overlapping) multiplier
-    nodeRepulsion: node => 4500,
+    nodeRepulsion: node => 8000,
     // Ideal edge (non nested) length
-    idealEdgeLength: edge => 50,
+    idealEdgeLength: edge => 400,
     // Divisor to compute edge forces
-    edgeElasticity: edge => 0.1,
+    edgeElasticity: edge => 0.4,
     // Nesting factor (multiplier) to compute ideal edge length for nested edges
     nestingFactor: 0.1,
     // Maximum number of iterations to perform - this is a suggested value and might be adjusted by the algorithm as required

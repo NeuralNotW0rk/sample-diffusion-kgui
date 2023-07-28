@@ -171,6 +171,15 @@ function KnowledgeGraph({ pendingRefresh }) {
                     setToolParams({ nodeData });
                 }
             },
+            {
+                content: 'Export',
+                select: function (ele) {
+                    setActiveTool('exportBatch');
+
+                    const nodeData = ele.json().data;
+                    setToolParams({ nodeData });
+                }
+            },
         ]
         cy.cxtmenu({
             selector: 'node[type="batch"][?isExpanded]',

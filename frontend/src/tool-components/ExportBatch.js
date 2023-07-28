@@ -3,7 +3,7 @@ import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material
 
 import { ToolContext } from '../App';
 
-function ExportSingle() {
+function ExportBatch() {
 
     const { toolParams, setAwaitingResponse } = useContext(ToolContext);
 
@@ -22,7 +22,7 @@ function ExportSingle() {
         formData.append('name', toolParams.nodeData.name);
 
         setAwaitingResponse(true);
-        fetch('/export-single', {
+        fetch('/export-batch', {
             method: 'POST',
             body: formData
         })
@@ -45,11 +45,11 @@ function ExportSingle() {
             spacing={2}
             alignItems='center'
         >
-            <Typography variant='h6'>Export Audio Sample</Typography>
+            <Typography variant='h6'>Export Audio Batch</Typography>
             <TextField
                 name='name'
                 value={toolParams.nodeData.name}
-                label='Sample name'
+                label='Batch name'
                 disabled
             />
             <TextField
@@ -66,4 +66,4 @@ function ExportSingle() {
     );
 };
 
-export default ExportSingle;
+export default ExportBatch;

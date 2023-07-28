@@ -13,7 +13,6 @@ import {
     IconButton
 } from '@mui/material';
 import { Autorenew } from '@mui/icons-material';
-import './Tools.css';
 
 import { ToolContext } from '../App';
 
@@ -90,7 +89,7 @@ function Generation() {
             <TextField
                 name='batch_size'
                 type='number'
-                defaultValue='1'
+                defaultValue='8'
                 label='Batch size'
                 inputProps={{ min: 1 }}
             />
@@ -115,7 +114,7 @@ function Generation() {
             <TextField
                 name='steps'
                 type='number'
-                defaultValue='50'
+                defaultValue='200'
                 label='Step count'
                 inputProps={{ min: 1 }}
             />

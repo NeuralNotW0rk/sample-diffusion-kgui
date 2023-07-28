@@ -91,6 +91,15 @@ def export_single():
     )
     return jsonify({'message': 'success'})
 
+# Copy an audio batch to a new folder for easier access
+@app.route('/export-batch', methods=['POST'])
+def export_batch():
+    ddkg.export_batch(
+        name=request.form['name'],
+        export_name=request.form['export_name']
+    )
+    return jsonify({'message': 'success'})
+
 
 # -----------------------
 #  External data sources

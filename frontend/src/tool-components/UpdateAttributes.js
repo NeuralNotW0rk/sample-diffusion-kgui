@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
-import './Tools.css';
 
 import { ToolContext } from '../App';
 

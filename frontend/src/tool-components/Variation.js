@@ -8,7 +8,9 @@ import {
     MenuItem,
     Select,
     Stack,
-    ButtonGroup
+    ButtonGroup,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
 import { Autorenew } from '@mui/icons-material';
 
@@ -32,6 +34,10 @@ function Variation() {
     const [seed, setSeed] = useState(0);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
+
+    function randomizeSeed() {
+        setSeed(Math.floor(Math.random() * 4294967294));
+    }
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -109,7 +115,7 @@ function Variation() {
             <TextField
                 name='batch_size'
                 type='number'
-                defaultValue='1'
+                defaultValue='8'
                 label='Batch size'
                 inputProps={{ min: 1 }}
             />
@@ -134,7 +140,7 @@ function Variation() {
             <TextField
                 name='steps'
                 type='number'
-                defaultValue='50'
+                defaultValue='200'
                 label='Step count'
                 inputProps={{ min: 1 }}
             />

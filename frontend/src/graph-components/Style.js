@@ -127,6 +127,7 @@ const defaultStyle = [
     {
         selector: 'edge[type="audio_source"]',
         style: {
+            'label': 'data(strength)',
             'line-color': audioColor,
             'target-arrow-color': audioColor,
             'line-style': 'dashed',

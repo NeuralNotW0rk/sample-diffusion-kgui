@@ -55,7 +55,7 @@ def log_inference(
             audio_source_name,
             batch_name,
             type='audio_source',
-            strength=1 - noise_level,
+            strength=round(1 - noise_level, 5)
         )
 
     # Create individual samples
