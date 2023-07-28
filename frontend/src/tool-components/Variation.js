@@ -1,8 +1,18 @@
-import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup } from '@mui/material';
-import './Tools.css';
+import React, { useContext, useState } from 'react';
+import {
+    Typography,
+    TextField,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    ButtonGroup
+} from '@mui/material';
+import { Autorenew } from '@mui/icons-material';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function Variation() {
     const defaultSampler = 'V_IPLMS';
@@ -19,6 +29,7 @@ function Variation() {
     const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size || '65536');
     const [resample, setResample] = useState(true);
     const [selectedModel, setSelectedModel] = useState(nodeNames.model[0]);
+    const [seed, setSeed] = useState(0);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
     const [selectedScheduler, setSelectedScheduler] = useState(defaultScheduler);
 
@@ -32,6 +43,7 @@ function Variation() {
         formData.append('sample_rate', toolParams.nodeData.sample_rate);
         formData.append('resample', resample);
         formData.append('model_name', selectedModel);
+        formData.append('seed', seed);
         formData.append('sampler_type_name', selectedSampler);
         formData.append('scheduler_type_name', selectedScheduler);
 
@@ -56,23 +68,23 @@ function Variation() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Variation</Typography>
+            <Typography variant='h6'>Variation</Typography>
             <TextField
-                name="audio_source_name"
+                name='audio_source_name'
                 value={toolParams.nodeData.name}
-                label="Audio source"
+                label='Audio source'
                 disabled
             />
             <TextField
-                name="sample_rate"
+                name='sample_rate'
                 value={toolParams.nodeData.sample_rate}
-                label="Sample rate"
+                label='Sample rate'
                 disabled
             />
             <FormControl>
@@ -87,39 +99,50 @@ function Variation() {
                 </Select>
             </FormControl>
             <TextField
-                name="chunk_size"
-                type="number"
+                name='chunk_size'
+                type='number'
                 value={chunkSize}
-                onChange={(e) => setChunkSize(e.target.value)}
-                label="Chunk size"
+                onChange={(event) => setChunkSize(event.target.value)}
+                label='Chunk size'
                 inputProps={{ min: 32768, step: 32768 }}
             />
             <TextField
-                name="batch_size"
-                type="number"
-                defaultValue="1"
-                label="Batch size"
+                name='batch_size'
+                type='number'
+                defaultValue='1'
+                label='Batch size'
                 inputProps={{ min: 1 }}
             />
             <TextField
-                name="seed"
-                type="number"
-                defaultValue="0"
-                label="Seed"
+                value={seed}
+                onChange={(event) => setSeed(event.target.value)}
+                type='number'
+                label='Seed'
                 inputProps={{ min: 0 }}
+                InputProps={{
+                    endAdornment: <InputAdornment posiion='end'>
+                        <IconButton
+                            aria-label='randomize'
+                            onClick={randomizeSeed}
+                            edge='end'
+                        >
+                            <Autorenew />
+                        </IconButton>
+                    </InputAdornment>
+                }}
             />
             <TextField
-                name="steps"
-                type="number"
-                defaultValue="50"
-                label="Step count"
+                name='steps'
+                type='number'
+                defaultValue='50'
+                label='Step count'
                 inputProps={{ min: 1 }}
             />
             <TextField
-                name="noise_level"
-                type="number"
-                defaultValue="0.7"
-                label="Noise level"
+                name='noise_level'
+                type='number'
+                defaultValue='0.7'
+                label='Noise level'
                 inputProps={{ min: 0.0, max: 1.0, step: 0.1 }}
             />
             <FormControl>
@@ -144,9 +167,9 @@ function Variation() {
                     ))}
                 </Select>
             </FormControl>
-            <ButtonGroup variant="contained" >
-                <Button type="reset" variant="contained">Default</Button>
-                <Button type="submit" variant="contained">Generate</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset' variant='contained'>Default</Button>
+                <Button type='submit' variant='contained'>Generate</Button>
             </ButtonGroup>
         </Stack>
     );

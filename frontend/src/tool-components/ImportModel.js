@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, IconButton, InputAdornment, Icon, ListItemIcon } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import React, { useContext } from 'react';
+import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function ImportModel() {
     const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
@@ -37,78 +36,78 @@ function ImportModel() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Import Model</Typography>
+            <Typography variant='h6'>Import Model</Typography>
             <TextField
-                name="model_name"
-                label="Model name"
+                name='model_name'
+                label='Model name'
                 required
             />
             <Button
-                variant="contained"
-                component="label"
+                variant='contained'
+                component='label'
             >
                 Upload File
                 <input
-                    type="file"
+                    type='file'
                     hidden
                 />
             </Button>
             <TextField
-                name="model_path"
-                label="Model path"
+                name='model_path'
+                label='Model path'
                 required
-                /*
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <IconButton
-                                edge="end"
-                                component="label"
-                            >
-                                <Search />
-                                <input
-                                    type="file"
-                                    hidden
-                                    onChange={(e) => {
-                                        console.log(e);
-                                    }}
-                                />
-                            </IconButton>
-                        </InputAdornment>
-                    )
-                }}
-                */
+            /*
+            InputProps={{
+                endAdornment: (
+                    <InputAdornment position='end'>
+                        <IconButton
+                            edge='end'
+                            component='label'
+                        >
+                            <Search />
+                            <input
+                                type='file'
+                                hidden
+                                onChange={(e) => {
+                                    console.log(e);
+                                }}
+                            />
+                        </IconButton>
+                    </InputAdornment>
+                )
+            }}
+            */
             />
             <TextField
-                name="chunk_size"
-                type="number"
-                defaultValue="65536"
-                label="Chunk size"
+                name='chunk_size'
+                type='number'
+                defaultValue='65536'
+                label='Chunk size'
                 inputProps={{ min: 1 }}
             />
             <TextField
-                name="sample_rate"
-                type="number"
-                defaultValue="44100"
-                label="Sample rate"
+                name='sample_rate'
+                type='number'
+                defaultValue='44100'
+                label='Sample rate'
                 inputProps={{ min: 1 }}
             />
             <TextField
-                name="steps"
-                type="number"
-                defaultValue="0"
-                label="Training steps"
+                name='steps'
+                type='number'
+                defaultValue='0'
+                label='Training steps'
                 inputProps={{ min: 0 }}
             />
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Import</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Import</Button>
             </ButtonGroup>
         </Stack>
     );

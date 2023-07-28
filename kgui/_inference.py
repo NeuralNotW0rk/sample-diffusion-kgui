@@ -26,18 +26,18 @@ def log_inference(
     current_time = int(time())
 
     # Create batch node and edge from model
-    sample_prefix = f"{model_name}_{seed}_{current_time}"
-    batch_name = f"batch_{sample_prefix}"
+    sample_prefix = f'{model_name}_{seed}_{current_time}'
+    batch_name = f'batch_{sample_prefix}'
     self.G.add_node(
         batch_name,
-        alias=f"{model_name[:3]}_{batch_name[-10:]}",
-        type="batch",
+        alias=f'{model_name[:3]}_{batch_name[-10:]}',
+        type='batch',
         created=current_time,
     )
     self.G.add_edge(
         model_name,
         batch_name,
-        type=f"dd_{mode}",
+        type=f'dd_{mode}',
         model_name=model_name,
         chunk_size=chunk_size,
         batch_size=batch_size,
@@ -49,12 +49,12 @@ def log_inference(
     )
 
     # Variation case
-    if mode == "variation":
-        self.G.edges[model_name, batch_name]["noise_level"] = noise_level
+    if mode == 'variation':
+        self.G.edges[model_name, batch_name]['noise_level'] = noise_level
         self.G.add_edge(
             audio_source_name,
             batch_name,
-            type="audio_source",
+            type='audio_source',
             strength=1 - noise_level,
         )
 
@@ -63,31 +63,31 @@ def log_inference(
     for i, sample in enumerate(output):
         # Save audio
         batch_index = i + 1
-        audio_name = f"sample_{sample_prefix}_{batch_index}"
-        audio_path = batch_dir / f"{audio_name}.wav"
-        open(str(audio_path), "a").close()
+        audio_name = f'sample_{sample_prefix}_{batch_index}'
+        audio_path = batch_dir / f'{audio_name}.wav'
+        open(str(audio_path), 'a').close()
         torchaudio.save(str(audio_path), sample.cpu(), sample_rate)
 
         # Create node
         self.G.add_node(
             audio_name,
-            alias=f"{model_name[:3]}_{batch_name[-10:]}_{batch_index}",
+            alias=f'{model_name[:3]}_{batch_name[-10:]}_{batch_index}',
             batch_index=batch_index,
-            type="audio",
+            type='audio',
             path=str(audio_path.relative_to(self.root)),
             sample_rate=sample_rate,
             chunk_size=chunk_size,
             created=current_time,
             parent=batch_name,
         )
-        """
+        '''
         self.G.add_edge(
             audio_name,
             batch_name,
             type='batch_split',
             created=current_time
         )
-        """
+        '''
 
     # Save on success
     self.save()

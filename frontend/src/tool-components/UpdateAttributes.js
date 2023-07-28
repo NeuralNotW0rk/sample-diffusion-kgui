@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled} from '@mui/material';
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import React, { useContext, useEffect, useState } from 'react';
+import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled } from '@mui/material';
+import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 
 const StyledRating = styled(Rating)(({ theme }) => ({
@@ -14,23 +14,23 @@ const StyledRating = styled(Rating)(({ theme }) => ({
 
 const customIcons = {
     1: {
-        icon: <Favorite style={{color: '#002254'}} />,
+        icon: <Favorite style={{ color: '#002254' }} />,
         label: 'Unuseable',
     },
     2: {
-        icon: <Favorite style={{color: '#004294'}} />,
+        icon: <Favorite style={{ color: '#004294' }} />,
         label: 'Barely useable',
     },
     3: {
-        icon: <Favorite style={{color: '#5b3285'}} />,
+        icon: <Favorite style={{ color: '#5b3285' }} />,
         label: 'Works',
     },
     4: {
-        icon: <Favorite style={{color: '#7e1b6a'}} />,
+        icon: <Favorite style={{ color: '#7e1b6a' }} />,
         label: 'Works well',
     },
     5: {
-        icon: <Favorite style={{color: '#8f004a'}} />,
+        icon: <Favorite style={{ color: '#8f004a' }} />,
         label: 'Favorite',
     },
 };
@@ -67,7 +67,7 @@ function UpdateAttributes() {
         formData.append('name', toolParams.nodeData.name)
         formData.append('tags', selectedTags);
         formData.append('rating', rating);
-        
+
         formData.get('alias') === '' && formData.delete('alias');
         formData.get('caption') === '' && formData.delete('caption');
 
@@ -90,27 +90,27 @@ function UpdateAttributes() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Update Attributes</Typography>
+            <Typography variant='h6'>Update Attributes</Typography>
             <TextField
-                name="name"
+                name='name'
                 value={toolParams.nodeData.name}
-                label="Sample name"
+                label='Sample name'
                 disabled
             />
             <TextField
-                name="alias"
+                name='alias'
                 value={alias}
                 onChange={(e) => setAlias(e.target.value)}
-                label="Alias"
+                label='Alias'
             />
             <StyledRating
-                name="hover-feedback"
+                name='hover-feedback'
                 value={rating}
                 getLabelText={(value) => customIcons[value].label}
                 onChange={(event, newRating) => {
@@ -120,7 +120,7 @@ function UpdateAttributes() {
                     setHoverRating(newHoverRating);
                 }}
                 icon={customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].icon : null}
-                emptyIcon={<FavoriteBorder fontSize="inherit" />}
+                emptyIcon={<FavoriteBorder fontSize='inherit' />}
             />
             <Box sx={{ ml: 2 }}>{customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].label : null}</Box>
             <Autocomplete
@@ -134,26 +134,26 @@ function UpdateAttributes() {
                 }}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                        <Chip variant='outlined' label={option} {...getTagProps({ index })} />
                     ))
                 }
                 renderInput={(params) => (
                     <TextField
                         {...params}
-                        label="Tags"
+                        label='Tags'
                     />
                 )}
 
             />
             <TextField
-                name="caption"
+                name='caption'
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                label="Caption"
+                label='Caption'
             />
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Update</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Update</Button>
             </ButtonGroup>
         </Stack>
     );

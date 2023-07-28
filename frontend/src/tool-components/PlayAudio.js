@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from "react";
-import { Stack, Typography, Button, ButtonGroup } from "@mui/material";
+import React, { useContext, useEffect } from 'react';
+import { Stack, Typography, Button, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 
 function PlayAudio() {
     const { toolParams } = useContext(ToolContext);
-    
+
     const audioContext = new AudioContext({ latencyHint: 'playback' })
 
     useEffect(() => {
@@ -37,11 +37,11 @@ function PlayAudio() {
     return (
         <Stack
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Play Audio</Typography>
-            <Typography variant="body1">{toolParams.nodeData.alias}</Typography>
-            <ButtonGroup variant="contained" >
+            <Typography variant='h6'>Play Audio</Typography>
+            <Typography variant='body1'>{toolParams.nodeData.alias}</Typography>
+            <ButtonGroup variant='contained' >
                 <Button onClick={initSound}>Replay</Button>
             </ButtonGroup>
         </Stack>

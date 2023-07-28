@@ -13,7 +13,7 @@ import LoadProject from './LoadProject';
 function ToolBox({ activeTool }) {
 
   return (
-    <div className="toolbox-component">
+    <div className='toolbox-component'>
       {activeTool === 'loadProject' && <LoadProject />}
       {activeTool === 'importModel' && <ImportModel />}
       {activeTool === 'externalSource' && <ExternalSource />}

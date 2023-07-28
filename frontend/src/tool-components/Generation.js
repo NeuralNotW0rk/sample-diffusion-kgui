@@ -1,9 +1,21 @@
-import React, { useContext, useState } from "react";
-import { Typography, TextField, Button, FormControl, InputLabel, MenuItem, Select, Stack, ButtonGroup, InputAdornment, IconButton } from '@mui/material';
-import { Autorenew, Shuffle } from '@mui/icons-material';
+import React, { useContext, useState } from 'react';
+import {
+    Typography,
+    TextField,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    ButtonGroup,
+    InputAdornment,
+    IconButton
+} from '@mui/material';
+import { Autorenew } from '@mui/icons-material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function Generation() {
     const defaultSampler = 'V_IPLMS';
@@ -56,37 +68,37 @@ function Generation() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center">
-            <Typography variant="h6">Generation</Typography>
+            alignItems='center'>
+            <Typography variant='h6'>Generation</Typography>
             <TextField
-                name="model_name"
+                name='model_name'
                 value={toolParams.nodeData.name}
-                label="Model"
+                label='Model'
                 disabled
             />
             <TextField
-                name="chunk_size"
-                type="number"
+                name='chunk_size'
+                type='number'
                 defaultValue={toolParams.nodeData.chunk_size}
-                label="Chunk size"
+                label='Chunk size'
                 inputProps={{ min: 32768, step: 32768 }}
             />
             <TextField
-                name="batch_size"
-                type="number"
-                defaultValue="1"
-                label="Batch size"
+                name='batch_size'
+                type='number'
+                defaultValue='1'
+                label='Batch size'
                 inputProps={{ min: 1 }}
             />
             <TextField
                 value={seed}
                 onChange={(event) => setSeed(event.target.value)}
-                type="number"
-                label="Seed"
+                type='number'
+                label='Seed'
                 inputProps={{ min: 0 }}
                 InputProps={{
                     endAdornment: <InputAdornment posiion='end'>
@@ -101,10 +113,10 @@ function Generation() {
                 }}
             />
             <TextField
-                name="steps"
-                type="number"
-                defaultValue="50"
-                label="Step count"
+                name='steps'
+                type='number'
+                defaultValue='50'
+                label='Step count'
                 inputProps={{ min: 1 }}
             />
             <FormControl>
@@ -129,9 +141,9 @@ function Generation() {
                     ))}
                 </Select>
             </FormControl>
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Generate</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Generate</Button>
             </ButtonGroup>
         </Stack>
     );

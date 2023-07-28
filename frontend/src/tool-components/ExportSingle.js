@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function ExportSingle() {
 
@@ -40,28 +40,28 @@ function ExportSingle() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Export Audio Sample</Typography>
+            <Typography variant='h6'>Export Audio Sample</Typography>
             <TextField
-                name="name"
+                name='name'
                 value={toolParams.nodeData.name}
-                label="Sample name"
+                label='Sample name'
                 disabled
             />
             <TextField
-                name="export_name"
+                name='export_name'
                 value={exportName}
                 onChange={(e) => setExportName(e.target.value)}
-                label="Export name"
+                label='Export name'
             />
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Export</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Export</Button>
             </ButtonGroup>
         </Stack>
     );

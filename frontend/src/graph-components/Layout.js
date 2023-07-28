@@ -1,12 +1,12 @@
 const defaultLayout = {
     name: 'fcose',
     // 'draft', 'default' or 'proof' 
-    // - "draft" only applies spectral layout 
-    // - "default" improves the quality with incremental layout (fast cooling rate)
-    // - "proof" improves the quality with incremental layout (slow cooling rate) 
-    quality: "default",
+    // - 'draft' only applies spectral layout 
+    // - 'default' improves the quality with incremental layout (fast cooling rate)
+    // - 'proof' improves the quality with incremental layout (slow cooling rate) 
+    quality: 'default',
     // Use random node positions at beginning of layout
-    // if this is set to false, then quality option must be "proof"
+    // if this is set to false, then quality option must be 'proof'
     randomize: false, 
     // Whether or not to animate the layout
     animate: true, 
@@ -18,14 +18,14 @@ const defaultLayout = {
     fit: true, 
     // Padding around layout
     padding: 30,
-    // Whether to include labels in node dimensions. Valid in "proof" quality
+    // Whether to include labels in node dimensions. Valid in 'proof' quality
     nodeDimensionsIncludeLabels: true,
     // Whether or not simple nodes (non-compound nodes) are of uniform dimensions
     uniformNodeDimensions: false,
     // Whether to pack disconnected components - cytoscape-layout-utilities extension should be registered and initialized
     packComponents: false,
     // Layout step - all, transformed, enforced, cose - for debug purpose only
-    step: "all",
+    step: 'all',
     
     /* spectral layout options */
     

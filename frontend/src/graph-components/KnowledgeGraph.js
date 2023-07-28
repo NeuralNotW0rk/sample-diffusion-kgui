@@ -11,7 +11,7 @@ import defaultStyle from './Style';
 import defaultLayout from './Layout';
 import defaultOptions from './Options';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 import { Button, Box, Divider, Stack, Typography } from '@mui/material';
 
 cytoscape.use(layoutUtilities);
@@ -21,7 +21,7 @@ cytoscape.use(expandCollapse);
 //cytoscape.use(popper);
 
 const ReactButton = () => {
-    return <Button type="button">React Button</Button>;
+    return <Button type='button'>React Button</Button>;
 };
 
 const createContentFromComponent = (component) => {

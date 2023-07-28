@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext } from 'react';
 import { Typography, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function RescanSource() {
 
@@ -29,14 +29,14 @@ function RescanSource() {
     return (
         <Stack
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Rescan External Source</Typography>
-            <Typography variant="p1">
+            <Typography variant='h6'>Rescan External Source</Typography>
+            <Typography variant='p1'>
                 This will rescan the file structure of the specified external source.
                 Any new audio files will be added to existing sets, and any new subdirectories will be added as new sets.
             </Typography>
-            <ButtonGroup variant="contained" >
+            <ButtonGroup variant='contained' >
                 <Button onClick={rescan}>Rescan</Button>
             </ButtonGroup>
         </Stack>

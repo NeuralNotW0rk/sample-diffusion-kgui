@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function LoadProject() {
     const { setAwaitingResponse, setPendingRefresh, setProjectName, setActiveTool } = useContext(ToolContext);
@@ -36,20 +36,20 @@ function LoadProject() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Load/Create Project</Typography>
+            <Typography variant='h6'>Load/Create Project</Typography>
             <TextField
-                name="project_name"
-                label="Project name"
+                name='project_name'
+                label='Project name'
                 required
             />
-            <ButtonGroup variant="contained" >
-                <Button type="submit">Load</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='submit'>Load</Button>
             </ButtonGroup>
         </Stack>
     );

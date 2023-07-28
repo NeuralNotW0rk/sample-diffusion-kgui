@@ -9,9 +9,9 @@ def export_single(
     name: str,
     export_name: str,
 ):
-    audio_path = self.root / self.G.nodes[name]["path"]
+    audio_path = self.root / self.G.nodes[name]['path']
     target_path = (
-        check_dir(self.root / export) / f"{export_name}{audio_path.suffix}"
+        check_dir(self.root / export) / f'{export_name}{audio_path.suffix}'
     )
     os.system(f'cp "{audio_path}" "{target_path}"')
 
@@ -27,10 +27,10 @@ def export_batch(
     channels: int = 2,
 ):
     index = 1
-    target_dir = check_dir(self.root / export / f"{export_name}")
+    target_dir = check_dir(self.root / export / f'{export_name}')
     for _, data in self.G.nodes(data=True):
-        if data.get("parent") == name:
-            audio_path = self.root / data["path"]
+        if data.get('parent') == name:
+            audio_path = self.root / data['path']
             if chunk:
                 audio, file_sample_rate = torchaudio.load(str(audio_path))
                 target_sample_rate = file_sample_rate
@@ -44,12 +44,12 @@ def export_batch(
                     audio = audio.repeat(channels, 1)
                 chunks = list(audio.split(chunk_size, 1))
                 for audio_chunk in chunks:
-                    target_path = target_dir / f"{export_name}_{index}.wav"
+                    target_path = target_dir / f'{export_name}_{index}.wav'
                     torchaudio.save(
                         str(target_path), audio_chunk.cpu(), target_sample_rate
                     )
                     index += 1
             else:
-                target_path = target_dir / f"{export_name}_{index}.wav"
+                target_path = target_dir / f'{export_name}_{index}.wav'
                 os.system(f'cp "{audio_path}" "{target_path}"')
                 index += 1

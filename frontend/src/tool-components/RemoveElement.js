@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function RemoveElement() {
 
@@ -37,16 +37,16 @@ function RemoveElement() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Remove Element</Typography>
-            <Typography variant="p1">Are you sure?</Typography>
-            <ButtonGroup variant="contained" >
-                <Button type="submit">Remove</Button>
+            <Typography variant='h6'>Remove Element</Typography>
+            <Typography variant='p1'>Are you sure?</Typography>
+            <ButtonGroup variant='contained' >
+                <Button type='submit'>Remove</Button>
             </ButtonGroup>
         </Stack>
     );

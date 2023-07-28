@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
-import { Stack, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from "@mui/material";
+import React, { useContext } from 'react';
+import { Stack, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 // Attributes not to show (so newly introduced attributes will show by default)
 const blacklist = [
@@ -26,11 +26,11 @@ function ViewDetails() {
     return (
         <Stack
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Details</Typography>
+            <Typography variant='h6'>Details</Typography>
             <TableContainer component={Paper}>
-                <Table aria-label="simple table">
+                <Table aria-label='simple table'>
                     <TableBody>
                         {Object.entries(toolParams.nodeData).map(([key, value]) => (
                             blacklist.includes(key) || (
@@ -38,10 +38,10 @@ function ViewDetails() {
                                     key={key}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell component="th" scope="row">
+                                    <TableCell component='th' scope='row'>
                                         {key}
                                     </TableCell>
-                                    <TableCell align="left">{String(value)}</TableCell>
+                                    <TableCell align='left'>{String(value)}</TableCell>
                                 </TableRow>
                             )
                         ))}

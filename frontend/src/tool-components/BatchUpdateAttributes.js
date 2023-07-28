@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup, Autocomplete, Chip, Rating, Box, styled, Checkbox, FormControlLabel } from '@mui/material';
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite } from '@mui/icons-material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 
 const StyledRating = styled(Rating)(({ theme }) => ({
@@ -97,24 +97,24 @@ function BatchUpdateAttributes() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">Update Batch Attributes</Typography>
+            <Typography variant='h6'>Update Batch Attributes</Typography>
             <TextField
-                name="name"
+                name='name'
                 value={toolParams.nodeData.name}
-                label="Batch name"
+                label='Batch name'
                 disabled
             />
             <TextField
-                name="alias"
+                name='alias'
                 value={alias}
                 onChange={(e) => setAlias(e.target.value)}
-                label="Alias"
+                label='Alias'
             />
             <FormControlLabel
                 control={
@@ -124,7 +124,7 @@ function BatchUpdateAttributes() {
                         defaultChecked={false}
                     />
                 }
-                label="Apply alias to children"
+                label='Apply alias to children'
             />
             <Box sx={{ ml: 2 }}>{customIcons[hoverRating !== -1 ? hoverRating : rating] ? customIcons[hoverRating !== -1 ? hoverRating : rating].label : null}</Box>
             <Autocomplete
@@ -138,20 +138,20 @@ function BatchUpdateAttributes() {
                 }}
                 renderTags={(value, getTagProps) =>
                     value.map((option, index) => (
-                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                        <Chip variant='outlined' label={option} {...getTagProps({ index })} />
                     ))
                 }
                 renderInput={(params) => (
                     <TextField
                         {...params}
-                        label="Tags"
+                        label='Tags'
                     />
                 )}
 
             />
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Update</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Update</Button>
             </ButtonGroup>
         </Stack>
     );

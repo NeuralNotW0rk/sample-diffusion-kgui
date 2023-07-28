@@ -15,6 +15,7 @@ class DDKnowledgeGraph:
         self.project_name = None
         self.load()
 
+    # Split functions into different files for readability
     from ._import import (
         import_model,
         add_external_source,
@@ -29,21 +30,21 @@ class DDKnowledgeGraph:
         check_dir(self.root)
 
         if os.path.exists(self.root / data_file):
-            with open(self.root / data_file, "r") as df:
+            with open(self.root / data_file, 'r') as df:
                 data = json.load(df)
-                self.project_name = data["project_name"]
-                self.export_target = Path(data["export_target"])
-                self.G = nx.cytoscape.cytoscape_graph(data["graph"])
+                self.project_name = data['project_name']
+                self.export_target = Path(data['export_target'])
+                self.G = nx.cytoscape.cytoscape_graph(data['graph'])
 
     def save(self):
         os.system(
             f'cp "{self.root / data_file}" "{check_dir(self.root / backups) / data_file}_{int(time())}"'
         )
-        with open(self.root / data_file, "w") as df:
+        with open(self.root / data_file, 'w') as df:
             data = {
-                "project_name": self.project_name,
-                "export_target": str(self.export_target),
-                "graph": nx.cytoscape.cytoscape_data(self.G),
+                'project_name': self.project_name,
+                'export_target': str(self.export_target),
+                'graph': nx.cytoscape.cytoscape_data(self.G),
             }
             df.write(json.dumps(data, indent=4))
 
@@ -57,25 +58,25 @@ class DDKnowledgeGraph:
 
     # Slightly less simple batch attribute update
     def update_batch(self, name: str, attrs: dict):
-        if "alias" in attrs:
+        if 'alias' in attrs:
             # Update batch alias
-            nx.function.set_node_attributes(self.G, {name: {"alias": attrs["alias"]}})
-            if attrs["apply_child_alias"]:
+            nx.function.set_node_attributes(self.G, {name: {'alias': attrs['alias']}})
+            if attrs['apply_child_alias']:
                 # Update all children aliases
                 for node, data in self.G.nodes(data=True):
-                    if data.get("parent") == name:
+                    if data.get('parent') == name:
                         new_alias = f'{attrs["alias"]}_{data["batch_index"]}'
-                        self.G.nodes[node]["alias"] = new_alias
+                        self.G.nodes[node]['alias'] = new_alias
 
-        if "tags" in attrs and attrs["tags"] != "":
+        if 'tags' in attrs and attrs['tags'] != '':
             # Add tags to child tag lists
             for node, data in self.G.nodes(data=True):
-                if data.get("parent") == name:
-                    delim = ","
+                if data.get('parent') == name:
+                    delim = ','
                     new_tags = delim.join(
-                        set(data["tags"].split(delim)) | set(attrs["tags"].split(delim))
+                        set(data['tags'].split(delim)) | set(attrs['tags'].split(delim))
                     )
-                    self.G.nodes[node]["tags"] = new_tags
+                    self.G.nodes[node]['tags'] = new_tags
 
         self.save()
 
@@ -83,7 +84,7 @@ class DDKnowledgeGraph:
     def remove_element(self, name: str):
         to_remove = [name]
         for node, data in self.G.nodes(data=True):
-            if data.get("parent") == name:
+            if data.get('parent') == name:
                 to_remove.append(node)
 
         self.G.remove_nodes_from(to_remove)

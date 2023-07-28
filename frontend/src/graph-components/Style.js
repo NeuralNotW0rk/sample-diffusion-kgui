@@ -153,4 +153,4 @@ const defaultStyle = [
 ]
 
 export default defaultStyle
-export {gradientColor1, gradientColor2, gradientColor3, gradientColor4, gradientColor5}
+export { gradientColor1, gradientColor2, gradientColor3, gradientColor4, gradientColor5 }

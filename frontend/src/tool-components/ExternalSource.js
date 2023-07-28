@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext } from 'react';
 import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
 import './Tools.css';
 
-import { ToolContext } from "../App";
+import { ToolContext } from '../App';
 
 function ExternalSource() {
 
@@ -37,26 +37,26 @@ function ExternalSource() {
 
     return (
         <Stack
-            component="form"
-            method="post"
+            component='form'
+            method='post'
             onSubmit={handleSubmit}
             spacing={2}
-            alignItems="center"
+            alignItems='center'
         >
-            <Typography variant="h6">External Source</Typography>
+            <Typography variant='h6'>External Source</Typography>
             <TextField
-                name="source_name"
-                label="Source name"
+                name='source_name'
+                label='Source name'
                 required
             />
             <TextField
-                name="source_root"
-                label="Source path"
+                name='source_root'
+                label='Source path'
                 required
             />
-            <ButtonGroup variant="contained" >
-                <Button type="reset">Default</Button>
-                <Button type="submit">Import</Button>
+            <ButtonGroup variant='contained' >
+                <Button type='reset'>Default</Button>
+                <Button type='submit'>Import</Button>
             </ButtonGroup>
         </Stack>
     );
