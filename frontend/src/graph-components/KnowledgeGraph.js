@@ -105,6 +105,12 @@ function KnowledgeGraph({ pendingRefresh }) {
                     }
                 },
                 {
+                    content: 't-SNE',
+                    select: function () {
+                        applyTsne();
+                    }
+                },
+                {
                     content: 'Import model',
                     select: function () {
                         setActiveTool('importModel');
@@ -430,6 +436,15 @@ function KnowledgeGraph({ pendingRefresh }) {
         // Restore removed elements
         audioSourceEdges.restore();
     };
+
+    function applyTsne() {
+        const cy = cytoscapeInstanceRef.current;
+        const scale = 100;
+        cy.$('node[type="audio"]').forEach((ele) => {
+            ele.position({ 'x': ele.data('tsne_1') * scale, 'y': ele.data('tsne_2') * scale });
+        });
+
+    }
 
     useEffect(() => {
         if (audioRef.current) {

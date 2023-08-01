@@ -161,37 +161,51 @@ def handle_sd_request():
 
     # Load audio source if specified
     audio_source = None
-    if 'audio_source_name' in args:
+    if args.get('audio_source_name'):
         audio_node = ddkg.G.nodes[args['audio_source_name']]
-        audio_source = crop_audio(load_audio(device_accelerator, ddkg.root / audio_node['path'], model_node['sample_rate']), args['chunk_size'])
+        audio_source = load_audio(device_accelerator, ddkg.root / audio_node['path'], model_node['sample_rate'])
         # Duplicate channel if source is mono
         if audio_source.size(0) == 1: audio_source = audio_source.repeat(2, 1)
     else:
         args['audio_source_name'] = None
 
-    # Construct sample diffusion request
-    sd_request = Request(
-        request_type=RequestType[args['mode']],
-        model_type=ModelType.DD,
-        model_chunk_size=args['chunk_size'],
-        model_sample_rate=args['sample_rate'],
+    if args['split_chunks']:
+        source_chunks = list(torch.split(audio_source, args['chunk_size'], dim=-1))
+    else:
+        source_chunks = [crop_audio(audio_source, args['chunk_size'])]
 
-        sampler_type=SamplerType[args['sampler_type_name']],
-        sampler_args={'use_tqdm': True},
+    print(source_chunks)
+    output_chunks = []
+    for chunk_index, chunk in enumerate(source_chunks):
+        print(f'Processing chunk {chunk_index + 1}/{len(source_chunks)}')
 
-        scheduler_type=SchedulerType[args['scheduler_type_name']],
-        scheduler_args={
-            'sigma_min': 0.1,  # TODO: make configurable
-            'sigma_max': 50.0,  # TODO: make configurable
-            'rho': 1.0  # TODO: make configurable
-        },
+        # Construct sample diffusion request
+        sd_request = Request(
+            request_type=RequestType[args['mode']],
+            model_type=ModelType.DD,
+            model_chunk_size=args['chunk_size'],
+            model_sample_rate=args['sample_rate'],
 
-        audio_source=audio_source,
-        **args
-    )
+            sampler_type=SamplerType[args['sampler_type_name']],
+            sampler_args={'use_tqdm': True},
 
-    # Get response, then log to ddkg
-    output = request_handler.process_request(sd_request).result
+            scheduler_type=SchedulerType[args['scheduler_type_name']],
+            scheduler_args={
+                'sigma_min': 0.1,  # TODO: make configurable
+                'sigma_max': 50.0,  # TODO: make configurable
+                'rho': 1.0  # TODO: make configurable
+            },
+
+            audio_source=chunk,
+            **args
+        )
+
+        # Get response, then log to ddkg
+        output_chunks.append(request_handler.process_request(sd_request).result)
+        print(output_chunks(chunk_index))
+    
+    output = torch.cat(output_chunks, dim=-1)
+
     ddkg.log_inference(
         output=output,
         **args
@@ -226,4 +240,9 @@ def remove_element():
     ddkg.remove_element(
         request.form['name']
     )
+    return jsonify({'message': 'success'})
+
+@app.route('/tsne', methods=['POST'])
+def compuite_tsne():
+    ddkg.compute_tsne()
     return jsonify({'message': 'success'})

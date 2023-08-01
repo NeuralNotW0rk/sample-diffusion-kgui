@@ -7,6 +7,10 @@ function RemoveElement() {
 
     const { toolParams, setActiveTool, setToolParams, setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
+    function handleCancel() {
+        setActiveTool('default');
+    }
+
     function handleSubmit(e) {
         e.preventDefault();
 
@@ -43,8 +47,9 @@ function RemoveElement() {
             alignItems='center'
         >
             <Typography variant='h6'>Remove Element</Typography>
-            <Typography variant='p1'>Are you sure?</Typography>
+            <Typography variant='body1'>Are you sure?</Typography>
             <ButtonGroup variant='contained' >
+                <Button onClick={handleCancel}>Cancel</Button>
                 <Button type='submit'>Remove</Button>
             </ButtonGroup>
         </Stack>

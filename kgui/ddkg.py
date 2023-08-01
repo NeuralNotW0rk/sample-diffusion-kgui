@@ -1,11 +1,14 @@
 import os
 import json
+
 from pathlib import Path
 from time import time
+
 import networkx as nx
 
 from .util import *
 
+DEFAULT_SR = 48000
 
 class DDKnowledgeGraph:
     def __init__(self, data_path, backend=None, relative=True) -> None:
@@ -24,6 +27,7 @@ class DDKnowledgeGraph:
     )
     from ._export import export_single, export_batch
     from ._inference import log_inference
+    from ._cluster import compute_tsne
 
     # IO functions
     def load(self):
