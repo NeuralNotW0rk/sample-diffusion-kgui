@@ -8,7 +8,7 @@ from sklearn.manifold import TSNE
 from .util import *
 
 
-def compute_tsne(
+def update_tsne(
     self, n_components=2, perplexity=40, n_iter=300, sample_rate=48000, sample_size=None
 ):
     if sample_size is None:
@@ -18,11 +18,11 @@ def compute_tsne(
     names = []
     samples = []
     for node, data in self.G.nodes(data=True):
-        if data["type"] == "audio":
+        if data['type'] == 'audio':
             names.append(node)
 
             sample_raw = load_audio(
-                "cpu", str(self.root / data["path"]), sample_rate=sample_rate
+                'cpu', str(self.root / data['path']), sample_rate=sample_rate
             )
             sample = torch.zeros(sample_size)
             sample += sample_raw[0, :sample_size]
@@ -45,6 +45,5 @@ def compute_tsne(
     attrs = {}
     for name, result in zip(names, tsne_results):
         attrs[name] = {f'tsne_{dim + 1}': float(result[dim]) for dim in range(n_components)}
-        print(attrs)
+    
     nx.set_node_attributes(self.G, attrs)
-    self.save()

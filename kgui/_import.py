@@ -36,8 +36,6 @@ def import_model(
         created=int(time()),
     )
 
-    # Save on success
-    self.save()
     return True
 
 
@@ -48,8 +46,6 @@ def add_external_source(
     source_root: str,
 ):
     self.G.add_node(source_name, path=source_root, type='external', created=int(time()))
-
-    self.save()
 
 
 # Scan external source
@@ -89,8 +85,6 @@ def scan_external_source(
                         )
 
     # TODO: Remove nodes for data that no longer exists
-
-    self.save()
 
 
 # Manually import an external audio dataset

@@ -105,7 +105,7 @@ function UpdateAttributes() {
             <TextField
                 name='alias'
                 value={alias}
-                onChange={(e) => setAlias(e.target.value)}
+                onChange={(event) => setAlias(event.target.value)}
                 label='Alias'
             />
             <StyledRating

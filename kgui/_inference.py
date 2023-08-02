@@ -4,7 +4,6 @@ import torchaudio
 
 from .util import *
 
-
 # Basic inference
 def log_inference(
     self,
@@ -88,7 +87,4 @@ def log_inference(
             created=current_time
         )
         '''
-
-    # Save on success
-    self.save()
     return True

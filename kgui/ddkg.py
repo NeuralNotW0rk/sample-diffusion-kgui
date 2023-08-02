@@ -27,7 +27,7 @@ class DDKnowledgeGraph:
     )
     from ._export import export_single, export_batch
     from ._inference import log_inference
-    from ._cluster import compute_tsne
+    from ._cluster import update_tsne
 
     # IO functions
     def load(self):
@@ -52,13 +52,20 @@ class DDKnowledgeGraph:
             }
             df.write(json.dumps(data, indent=4))
 
-    def to_json(self):
-        return nx.cytoscape.cytoscape_data(self.G)
+    def to_json(self, mode='batch'):
+        if mode == 'batch':
+            return nx.cytoscape.cytoscape_data(self.G)
+        elif mode == 'cluster':
+            C = nx.DiGraph()
+            for node, data in self.G.nodes(data=True):
+                if data['type'] == 'audio':
+                    C.add_node(node, **data)
+                    C.nodes[node].pop('parent')
+            return nx.cytoscape.cytoscape_data(C)
 
     # Simple element attribute update
     def update_element(self, name: str, attrs: dict):
         nx.function.set_node_attributes(self.G, {name: attrs})
-        self.save()
 
     # Slightly less simple batch attribute update
     def update_batch(self, name: str, attrs: dict):
@@ -82,8 +89,6 @@ class DDKnowledgeGraph:
                     )
                     self.G.nodes[node]['tags'] = new_tags
 
-        self.save()
-
     # Remove element (and children in the case of batches)
     def remove_element(self, name: str):
         to_remove = [name]
@@ -92,4 +97,3 @@ class DDKnowledgeGraph:
                 to_remove.append(node)
 
         self.G.remove_nodes_from(to_remove)
-        self.save()
