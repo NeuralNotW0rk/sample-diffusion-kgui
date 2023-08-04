@@ -399,7 +399,7 @@ function KnowledgeGraph({ pendingRefresh }) {
             setTagList(tagListTemp);
 
             // Signal active tool to update
-            if (toolParams) {
+            if (toolParams && toolParams.nodeData) {
                 const nodeData = cy.$id(toolParams.nodeData.id).json().data;
                 setToolParams({ nodeData });
             };

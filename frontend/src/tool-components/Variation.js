@@ -118,7 +118,7 @@ function Variation() {
                 control={
                     <Checkbox
                         checked={splitChunks}
-                        onChange={(e) => setSplitChunks(e.target.checked)}
+                        onChange={(event) => setSplitChunks(event.target.checked)}
                         defaultChecked={false}
                     />
                 }

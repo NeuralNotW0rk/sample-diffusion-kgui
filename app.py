@@ -22,7 +22,7 @@ ARG_TYPES = {
     'batch_size': int,
     'steps': int,
     'seed': int,
-    'noise_level': float,
+    'noise_level': float
 }
 
 app = Flask(__name__)
@@ -190,10 +190,10 @@ def handle_sd_request():
         else:
             args['audio_source_name'] = None
 
-        if args['split_chunks']:
+        if args['split_chunks'] == 'true':
             source_chunks = list(torch.split(audio_source, args['chunk_size'], dim=-1))
         else:
-            source_chunks = [audio_source, args['chunk_size']]
+            source_chunks = [audio_source]
 
         output_chunks = []
         for chunk_index, chunk in enumerate(source_chunks):
