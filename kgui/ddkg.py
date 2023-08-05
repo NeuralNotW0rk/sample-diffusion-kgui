@@ -13,6 +13,7 @@ DEFAULT_SR = 48000
 class DDKnowledgeGraph:
     def __init__(self, data_path, backend=None, relative=True) -> None:
         self.root = Path(data_path)
+        self.export_target = export
         self.backend = backend
         self.G = nx.DiGraph()
         self.project_name = None
@@ -22,6 +23,7 @@ class DDKnowledgeGraph:
     from ._import import (
         import_model,
         add_external_source,
+        scan_dir,
         scan_external_source,
         import_audio_set,
     )

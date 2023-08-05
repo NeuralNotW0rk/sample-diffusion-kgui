@@ -143,6 +143,7 @@ def import_model():
 def add_source():
     ddkg.add_external_source(request.form['source_name'], request.form['source_root'])
     ddkg.scan_external_source(request.form['source_name'])
+    ddkg.update_tsne()
     ddkg.save()
     return jsonify({'message': 'success'})
 
@@ -150,6 +151,7 @@ def add_source():
 @app.route('/rescan-source', methods=['POST'])
 def scan_source():
     ddkg.scan_external_source(request.args.get('name'))
+    ddkg.update_tsne()
     ddkg.save()
     return jsonify({'message': 'success'})
 

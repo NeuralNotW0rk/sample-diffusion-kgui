@@ -15,6 +15,7 @@ def update_tsne(
         sample_size = sample_rate
 
     # Gather audio samples
+    print('Gathering audio samples for t-SNE calculation...')
     names = []
     samples = []
     for node, data in self.G.nodes(data=True):
@@ -25,12 +26,14 @@ def update_tsne(
                 'cpu', str(self.root / data['path']), sample_rate=sample_rate
             )
             sample = torch.zeros(sample_size)
-            sample += sample_raw[0, :sample_size]
+            cropped_size = min(sample_size, sample_raw.size(1))
+            sample[:cropped_size] += sample_raw[0, :cropped_size]
             samples.append(sample.numpy())
 
     samples = np.asarray(samples)
 
     # Convert to spectrograms
+    print('Extracting spectrograms...')
     specs = lr.stft(samples, n_fft=512)
     specs = np.abs(specs)
     specs = np.reshape(specs, newshape=(specs.shape[0], specs.shape[1] * specs.shape[2]))

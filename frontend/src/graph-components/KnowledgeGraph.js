@@ -431,7 +431,7 @@ function KnowledgeGraph({ pendingRefresh }) {
 
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
-        const scale = 100;
+        const scale = 1000;
 
         var fixedNodeConstraint = [];
         if (viewMode === 'cluster') {
