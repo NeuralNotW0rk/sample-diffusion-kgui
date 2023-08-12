@@ -10,7 +10,9 @@ import {
     Stack,
     ButtonGroup,
     InputAdornment,
-    IconButton
+    IconButton,
+    FormControlLabel,
+    Checkbox
 } from '@mui/material';
 import { Autorenew } from '@mui/icons-material';
 
@@ -29,7 +31,7 @@ function Variation() {
         setPendingRefresh
     } = useContext(ToolContext);
     const [chunkSize, setChunkSize] = useState(toolParams.nodeData.chunk_size || '65536');
-    const [resample, setResample] = useState(true);
+    const [splitChunks, setSplitChunks] = useState(false);
     const [selectedModel, setSelectedModel] = useState(nodeNames.model[0]);
     const [seed, setSeed] = useState(0);
     const [selectedSampler, setSelectedSampler] = useState(defaultSampler);
@@ -47,7 +49,7 @@ function Variation() {
         formData.append('mode', 'Variation');
         formData.append('audio_source_name', toolParams.nodeData.name);
         formData.append('sample_rate', toolParams.nodeData.sample_rate);
-        formData.append('resample', resample);
+        formData.append('split_chunks', splitChunks);
         formData.append('model_name', selectedModel);
         formData.append('seed', seed);
         formData.append('sampler_type_name', selectedSampler);
@@ -112,6 +114,16 @@ function Variation() {
                 label='Chunk size'
                 inputProps={{ min: 32768, step: 32768 }}
             />
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={splitChunks}
+                        onChange={(event) => setSplitChunks(event.target.checked)}
+                        defaultChecked={false}
+                    />
+                }
+                label='Split into chunks'
+            />
             <TextField
                 name='batch_size'
                 type='number'
@@ -126,7 +138,7 @@ function Variation() {
                 label='Seed'
                 inputProps={{ min: 0 }}
                 InputProps={{
-                    endAdornment: <InputAdornment posiion='end'>
+                    endAdornment: <InputAdornment position='end'>
                         <IconButton
                             aria-label='randomize'
                             onClick={randomizeSeed}

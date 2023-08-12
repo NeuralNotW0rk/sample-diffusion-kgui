@@ -1,7 +1,24 @@
 
 import React, { createContext, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, Drawer, AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Divider, Autocomplete, TextField} from '@mui/material';
+import {
+  CssBaseline,
+  Box,
+  Drawer,
+  AppBar,
+  Toolbar,
+  Typography,
+  Menu,
+  MenuItem,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Autocomplete,
+  TextField,
+  ToggleButtonGroup,
+  ToggleButton
+} from '@mui/material';
 import { FolderOpen, MenuOpen, Refresh, Save } from '@mui/icons-material';
 
 //import './App.css';
@@ -54,13 +71,15 @@ function App() {
   const [nodeNames, setNodeNames] = useState(null);
   const [tagList, setTagList] = useState(null);
 
-  const [activeTool, setActiveTool] = useState('default')
+  const [viewMode, setViewMode] = useState('batch');
+  const [activeTool, setActiveTool] = useState('default');
   const [toolParams, setToolParams] = useState(null);
   const [awaitingResponse, setAwaitingResponse] = useState(false);
   const [pendingRefresh, setPendingRefresh] = useState(true);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
   };
@@ -68,8 +87,14 @@ function App() {
     setAnchorEl(null);
   };
 
+  function handleViewModeChange(mode) {
+    setViewMode(mode);
+    setPendingRefresh(true);
+  }
+
   return (<ThemeProvider theme={defaultTheme}>
     <ToolContext.Provider value={{
+      viewMode,
       typeNames,
       nodeNames,
       projectName,
@@ -124,9 +149,18 @@ function App() {
                 <ListItemText>Open</ListItemText>
               </MenuItem>
             </Menu>
-            <Typography variant='h6' noWrap component='div'>
+            <Typography variant='h6' noWrap component='div' padding={2}>
               Dance Diffusion KGUI
             </Typography>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(event) => handleViewModeChange(event.target.value)}
+              aria-label="View Mode"
+            >
+              <ToggleButton value="batch">Batch</ToggleButton>
+              <ToggleButton value="cluster">Cluster</ToggleButton>
+            </ToggleButtonGroup>
           </Toolbar>
         </AppBar>
         <Drawer

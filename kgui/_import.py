@@ -36,8 +36,6 @@ def import_model(
         created=int(time()),
     )
 
-    # Save on success
-    self.save()
     return True
 
 
@@ -49,9 +47,43 @@ def add_external_source(
 ):
     self.G.add_node(source_name, path=source_root, type='external', created=int(time()))
 
-    self.save()
 
-
+def scan_dir(
+    self,
+    parent_path,
+    parent_node,
+    current_time
+):
+    # Add/update children
+    print(f'Scanning {parent_path}')
+    for idx, child_path in enumerate(parent_path.iterdir()):
+        if child_path.is_dir():
+            # Create a compound node if needed and recurse
+            if not self.G.has_node(child_path.name):
+                self.G.add_node(
+                    child_path.name,
+                    alias=child_path.name,
+                    type='set',
+                    created=current_time,
+                    parent=parent_node,
+                )
+            self.scan_dir(child_path, child_path.name, current_time)
+        elif child_path.suffix in ['.wav', '.mp3']:
+            # Create an audio node if needed
+            if not self.G.has_node(child_path.stem):
+                _, sample_rate = sf.read(str(child_path))
+                self.G.add_node(
+                    child_path.stem,
+                    alias=child_path.stem,
+                    set_index=idx,
+                    type='audio',
+                    path=str(child_path),
+                    sample_rate=sample_rate,
+                    created=current_time,
+                    parent=parent_node,
+                )
+                print(f'Added {child_path.stem} to {parent_path.name}')
+    
 # Scan external source
 def scan_external_source(
     self,
@@ -71,26 +103,10 @@ def scan_external_source(
                 self.G.add_edge(
                     source_name, set_name, type='import', created=current_time
                 )
-
-            # Add/update individual audio samples
-            for idx, sample_path in enumerate(audio_set_dir.iterdir()):
-                if not self.G.has_node(sample_path.name):
-                    if sample_path.suffix in ['.wav', '.mp3']:
-                        _, sample_rate = sf.read(str(sample_path))
-                        self.G.add_node(
-                            sample_path.stem,
-                            alias=sample_path.stem,
-                            set_index=idx,
-                            type='audio',
-                            path=str(sample_path),
-                            sample_rate=sample_rate,
-                            created=current_time,
-                            parent=set_name,
-                        )
+            self.scan_dir(audio_set_dir, set_name, current_time)
 
     # TODO: Remove nodes for data that no longer exists
 
-    self.save()
 
 
 # Manually import an external audio dataset
@@ -134,3 +150,4 @@ def import_audio_set(
                 created=current_time,
                 parent=set_name,
             )
+

@@ -32,7 +32,17 @@ const createContentFromComponent = (component) => {
 };
 
 function KnowledgeGraph({ pendingRefresh }) {
-    const { toolParams, setToolParams, setActiveTool, setPendingRefresh, setTypeNames, setNodeNames, setProjectName, setTagList } = useContext(ToolContext);
+    const {
+        viewMode,
+        toolParams,
+        setToolParams,
+        setActiveTool,
+        setPendingRefresh,
+        setTypeNames,
+        setNodeNames,
+        setProjectName,
+        setTagList
+    } = useContext(ToolContext);
 
     const cytoscapeContainerRef = useRef(null);
     const cytoscapeInstanceRef = useRef(null);
@@ -50,7 +60,12 @@ function KnowledgeGraph({ pendingRefresh }) {
     // Load graph from server
     const fetchGraphData = async () => {
         try {
-            const response = await fetch('/graph');
+            var response = null;
+            if (viewMode === 'cluster') {
+                response = await fetch('/graph-tsne')
+            } else {
+                response = await fetch('/graph');
+            }
             const data = await response.json();
             setGraphData(data);
         } catch (error) {
@@ -102,6 +117,12 @@ function KnowledgeGraph({ pendingRefresh }) {
                     content: 'Tidy',
                     select: function () {
                         applyFcose(false);
+                    }
+                },
+                {
+                    content: 't-SNE',
+                    select: function () {
+                        applyTsne();
                     }
                 },
                 {
@@ -329,6 +350,7 @@ function KnowledgeGraph({ pendingRefresh }) {
             // Apply layout if number of nodes has changed
             cy.nodes().length === positions.length || applyFcose();
 
+
             // Expand and collapse setup
             cy.$('node[type="batch"]').data('isExpanded', true);
 
@@ -377,7 +399,7 @@ function KnowledgeGraph({ pendingRefresh }) {
             setTagList(tagListTemp);
 
             // Signal active tool to update
-            if (toolParams) {
+            if (toolParams && toolParams.nodeData) {
                 const nodeData = cy.$id(toolParams.nodeData.id).json().data;
                 setToolParams({ nodeData });
             };
@@ -409,6 +431,14 @@ function KnowledgeGraph({ pendingRefresh }) {
 
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
+        const scale = 1000;
+
+        var fixedNodeConstraint = [];
+        if (viewMode === 'cluster') {
+            fixedNodeConstraint = cy.$('node[type="audio"]').map((ele) => {
+                return { 'nodeId': ele.data('id'), 'position': { 'x': ele.data('tsne_1') * scale, 'y': ele.data('tsne_2') * scale } };
+            });
+        };
 
         // Workaround tiling issues by temporarily removing audio source edges
         var audioSourceEdges = cy.edges('[type="audio_source"]').remove();
@@ -417,6 +447,7 @@ function KnowledgeGraph({ pendingRefresh }) {
         var layout = cy.layout({
             ...defaultLayout,
             randomize,
+            fixedNodeConstraint,
             tilingCompareBy: (nodeId1, nodeId2) => {
                 if (cy.$id(nodeId1).data('type') === 'audio' && cy.$id(nodeId2).data('type') === 'audio') {
                     return cy.$id(nodeId1).data('batch_index') - cy.$id(nodeId2).data('batch_index');
@@ -429,7 +460,17 @@ function KnowledgeGraph({ pendingRefresh }) {
 
         // Restore removed elements
         audioSourceEdges.restore();
+        console.log('fCoSE applied');
     };
+
+    function applyTsne() {
+        const cy = cytoscapeInstanceRef.current;
+        const scale = 100;
+        cy.$('node[type="audio"]').forEach((ele) => {
+            ele.position({ 'x': ele.data('tsne_1') * scale, 'y': ele.data('tsne_2') * scale });
+        });
+        console.log('t-SNE applied');
+    }
 
     useEffect(() => {
         if (audioRef.current) {
