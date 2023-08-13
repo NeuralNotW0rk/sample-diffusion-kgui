@@ -33,6 +33,7 @@ def update_tsne(
     samples = np.asarray(samples)
 
     # Convert to spectrograms
+    # TODO: Save spectrograms for reuse
     print('Extracting spectrograms...')
     specs = lr.stft(samples, n_fft=512)
     specs = np.abs(specs)
@@ -40,7 +41,7 @@ def update_tsne(
 
     # Compute t-SNE
     tsne = TSNE(
-        n_components=n_components, verbose=1, perplexity=perplexity, n_iter=n_iter
+        n_components=n_components, verbose=1, perplexity=perplexity, n_iter=n_iter, random_state=0
     )
     tsne_results = tsne.fit_transform(specs)
 

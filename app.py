@@ -13,16 +13,16 @@ from diffusion_library.scheduler import SchedulerType
 
 from .kgui.ddkg import DDKnowledgeGraph
 
-PROJECT_DIR = Path('projects')
+PROJECT_DIR = Path("projects")
 
 ARG_TYPES = {
     # General inference
-    'sample_rate': int,
-    'chunk_size': int,
-    'batch_size': int,
-    'steps': int,
-    'seed': int,
-    'noise_level': float
+    "sample_rate": int,
+    "chunk_size": int,
+    "batch_size": int,
+    "steps": int,
+    "seed": int,
+    "noise_level": float,
 }
 
 app = Flask(__name__)
@@ -43,16 +43,16 @@ ddkg = None
 # --------------------
 
 
-@app.route('/load', methods=['POST'])
+@app.route("/load", methods=["POST"])
 def load_project():
     global ddkg
-    ddkg = DDKnowledgeGraph(str(PROJECT_DIR / request.form['project_name']))
+    ddkg = DDKnowledgeGraph(str(PROJECT_DIR / request.form["project_name"]))
     if ddkg:
         project_name = ddkg.root.name
         return jsonify(
-            {'message': f'Project loaded: {project_name}', 'project': project_name}
+            {"message": f"project loaded: {project_name}", "project": project_name}
         )
-    return jsonify({'message': 'No project loaded'})
+    return jsonify({"message": "no project loaded"})
 
 
 # ---------------
@@ -61,57 +61,66 @@ def load_project():
 
 
 # Sends the current project name
-@app.route('/project', methods=['GET'])
+@app.route("/project", methods=["GET"])
 def get_project():
-    return jsonify({'project_name': ddkg.root.name})
+    if ddkg is not None:
+        return jsonify({"message": "success", "project_name": ddkg.root.name})
+    else:
+        return jsonify({"message:": "no project selected"})
 
 
 # Sends lists of type names for samplers and schedulers
-@app.route('/sd-types', methods=['GET'])
+@app.route("/sd-types", methods=["GET"])
 def get_type_names():
     return jsonify(
         {
-            'samplers': [e.value for e in SamplerType],
-            'schedulers': [e.value for e in SchedulerType],
+            "samplers": [e.value for e in SamplerType],
+            "schedulers": [e.value for e in SchedulerType],
         }
     )
 
 
 # Sends the current graph state
-@app.route('/graph', methods=['GET'])
+@app.route("/graph", methods=["GET"])
 def get_graph():
-    return jsonify(ddkg.to_json())
+    if ddkg is not None:
+        return jsonify({'message': 'success', 'graph_data': ddkg.to_json()})
+    else:
+        return jsonify({"message:": "no project selected"})
 
 
 # Sends the current graph state
-@app.route('/graph-tsne', methods=['GET'])
+@app.route("/graph-tsne", methods=["GET"])
 def get_graph_tsne():
-    return jsonify(ddkg.to_json('cluster'))
+    if ddkg is not None:
+        return jsonify({'message': 'success', 'graph_data': ddkg.to_json('cluster')})
+    else:
+        return jsonify({"message:": "no project selected"})
 
 
 # Sends an audio file corresponding to the given name
-@app.route('/audio', methods=['GET'])
+@app.route("/audio", methods=["GET"])
 def get_audio():
-    path = (ddkg.root / ddkg.G.nodes[request.args.get('name')]['path']).resolve()
+    path = (ddkg.root / ddkg.G.nodes[request.args.get("name")]["path"]).resolve()
     return send_file(str(path))
 
 
 # Copy an audio file to a new folder for easier access
-@app.route('/export-single', methods=['POST'])
+@app.route("/export-single", methods=["POST"])
 def export_single():
     ddkg.export_single(
-        name=request.form['name'], export_name=request.form['export_name']
+        name=request.form["name"], export_name=request.form["export_name"]
     )
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
 # Copy an audio batch to a new folder for easier access
-@app.route('/export-batch', methods=['POST'])
+@app.route("/export-batch", methods=["POST"])
 def export_batch():
     ddkg.export_batch(
-        name=request.form['name'], export_name=request.form['export_name']
+        name=request.form["name"], export_name=request.form["export_name"]
     )
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
 # -----------------------
@@ -120,40 +129,40 @@ def export_batch():
 
 
 # Copies a model to the ddkg dir
-@app.route('/import-model', methods=['POST'])
+@app.route("/import-model", methods=["POST"])
 def import_model():
     if ddkg.import_model(
-        name=request.form['model_name'],
-        path=request.form['model_path'],
-        chunk_size=int(request.form['chunk_size']),
-        sample_rate=int(request.form['sample_rate']),
-        steps=int(request.form['steps']),
+        name=request.form["model_name"],
+        path=request.form["model_path"],
+        chunk_size=int(request.form["chunk_size"]),
+        sample_rate=int(request.form["sample_rate"]),
+        steps=int(request.form["steps"]),
         copy=True,
     ):
-        message = 'Model imported successfully'
+        message = "Model imported successfully"
     else:
         message = f'Model import failed: model id {request.form["name"]}'
 
     ddkg.save()
-    return jsonify({'message': message})
+    return jsonify({"message": message})
 
 
 # Adds an external source
-@app.route('/add-external-source', methods=['POST'])
+@app.route("/add-external-source", methods=["POST"])
 def add_source():
-    ddkg.add_external_source(request.form['source_name'], request.form['source_root'])
-    ddkg.scan_external_source(request.form['source_name'])
+    ddkg.add_external_source(request.form["source_name"], request.form["source_root"])
+    ddkg.scan_external_source(request.form["source_name"])
     ddkg.update_tsne()
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
-@app.route('/rescan-source', methods=['POST'])
+@app.route("/rescan-source", methods=["POST"])
 def scan_source():
-    ddkg.scan_external_source(request.args.get('name'))
+    ddkg.scan_external_source(request.args.get("name"))
     ddkg.update_tsne()
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
 # -----------------
@@ -162,7 +171,7 @@ def scan_source():
 
 
 # Handles basic sample-diffusion requests with minimal interference
-@app.route('/sd-request', methods=['POST'])
+@app.route("/sd-request", methods=["POST"])
 def handle_sd_request():
     # Cast args
     args = {
@@ -170,52 +179,52 @@ def handle_sd_request():
     }
 
     # Get model parameters from graph by name
-    model_node = ddkg.G.nodes[args['model_name']]
-    args['model_path'] = ddkg.root / model_node['path']
-    args['sample_rate'] = model_node['sample_rate']
+    model_node = ddkg.G.nodes[args["model_name"]]
+    args["model_path"] = ddkg.root / model_node["path"]
+    args["sample_rate"] = model_node["sample_rate"]
 
-    request_type = RequestType[args['mode']]
+    request_type = RequestType[args["mode"]]
 
     if request_type == RequestType.Variation:
         # Load audio source if specified
         audio_source = None
-        if args.get('audio_source_name'):
-            audio_node = ddkg.G.nodes[args['audio_source_name']]
+        if args.get("audio_source_name"):
+            audio_node = ddkg.G.nodes[args["audio_source_name"]]
             audio_source = load_audio(
                 device_accelerator,
-                ddkg.root / audio_node['path'],
-                model_node['sample_rate'],
+                ddkg.root / audio_node["path"],
+                model_node["sample_rate"],
             )
             # Duplicate channel if source is mono
             if audio_source.size(0) == 1:
                 audio_source = audio_source.repeat(2, 1)
         else:
-            args['audio_source_name'] = None
+            args["audio_source_name"] = None
 
-        if args['split_chunks'] == 'true':
-            source_chunks = list(torch.split(audio_source, args['chunk_size'], dim=-1))
+        if args["split_chunks"] == "true":
+            source_chunks = list(torch.split(audio_source, args["chunk_size"], dim=-1))
         else:
             source_chunks = [audio_source]
 
         output_chunks = []
         for chunk_index, chunk in enumerate(source_chunks):
-            print(f'Processing chunk {chunk_index + 1}/{len(source_chunks)}')
+            print(f"Processing chunk {chunk_index + 1}/{len(source_chunks)}")
 
             # Construct sample diffusion request
             sd_request = Request(
                 request_type=request_type,
                 model_type=ModelType.DD,
-                model_chunk_size=args['chunk_size'],
-                model_sample_rate=args['sample_rate'],
-                sampler_type=SamplerType[args['sampler_type_name']],
-                sampler_args={'use_tqdm': True},
-                scheduler_type=SchedulerType[args['scheduler_type_name']],
+                model_chunk_size=args["chunk_size"],
+                model_sample_rate=args["sample_rate"],
+                sampler_type=SamplerType[args["sampler_type_name"]],
+                sampler_args={"use_tqdm": True},
+                scheduler_type=SchedulerType[args["scheduler_type_name"]],
                 scheduler_args={
-                    'sigma_min': 0.1,  # TODO: make configurable
-                    'sigma_max': 50.0,  # TODO: make configurable
-                    'rho': 1.0,  # TODO: make configurable
+                    "sigma_min": 0.1,  # TODO: make configurable
+                    "sigma_max": 50.0,  # TODO: make configurable
+                    "rho": 1.0,  # TODO: make configurable
                 },
-                audio_source=crop_audio(chunk, chunk_size=args['chunk_size']),
+                audio_source=crop_audio(chunk, chunk_size=args["chunk_size"]),
                 **args,
             )
 
@@ -227,15 +236,15 @@ def handle_sd_request():
         sd_request = Request(
             request_type=request_type,
             model_type=ModelType.DD,
-            model_chunk_size=args['chunk_size'],
-            model_sample_rate=args['sample_rate'],
-            sampler_type=SamplerType[args['sampler_type_name']],
-            sampler_args={'use_tqdm': True},
-            scheduler_type=SchedulerType[args['scheduler_type_name']],
+            model_chunk_size=args["chunk_size"],
+            model_sample_rate=args["sample_rate"],
+            sampler_type=SamplerType[args["sampler_type_name"]],
+            sampler_args={"use_tqdm": True},
+            scheduler_type=SchedulerType[args["scheduler_type_name"]],
             scheduler_args={
-                'sigma_min': 0.1,  # TODO: make configurable
-                'sigma_max': 50.0,  # TODO: make configurable
-                'rho': 1.0,  # TODO: make configurable
+                "sigma_min": 0.1,  # TODO: make configurable
+                "sigma_max": 50.0,  # TODO: make configurable
+                "rho": 1.0,  # TODO: make configurable
             },
             **args,
         )
@@ -246,7 +255,7 @@ def handle_sd_request():
     ddkg.log_inference(output=output, **args)
     ddkg.update_tsne()
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
 # --------------------
@@ -254,22 +263,22 @@ def handle_sd_request():
 # --------------------
 
 
-@app.route('/update-element', methods=['POST'])
+@app.route("/update-element", methods=["POST"])
 def update_element():
-    ddkg.update_element(request.form['name'], dict(request.form))
+    ddkg.update_element(request.form["name"], dict(request.form))
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
-@app.route('/update-batch', methods=['POST'])
+@app.route("/update-batch", methods=["POST"])
 def update_batch():
-    ddkg.update_batch(request.form['name'], dict(request.form))
+    ddkg.update_batch(request.form["name"], dict(request.form))
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
 
 
-@app.route('/remove-element', methods=['POST'])
+@app.route("/remove-element", methods=["POST"])
 def remove_element():
-    ddkg.remove_element(request.form['name'])
+    ddkg.remove_element(request.form["name"])
     ddkg.save()
-    return jsonify({'message': 'success'})
+    return jsonify({"message": "success"})
