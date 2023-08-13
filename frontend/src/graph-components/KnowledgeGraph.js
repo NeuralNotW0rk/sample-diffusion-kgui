@@ -12,7 +12,7 @@ import defaultLayout from './Layout';
 import defaultOptions from './Options';
 
 import { ToolContext } from '../App';
-import { Button, Box, Divider, Stack, Typography } from '@mui/material';
+import { Button, Divider, Stack, Typography } from '@mui/material';
 
 cytoscape.use(layoutUtilities);
 cytoscape.use(fcose);
@@ -67,7 +67,9 @@ function KnowledgeGraph({ pendingRefresh }) {
                 response = await fetch('/graph');
             }
             const data = await response.json();
-            setGraphData(data);
+            if (data.message === 'success') {
+                setGraphData(data.graph_data);
+            }
         } catch (error) {
             console.error('Error fetching graph data:', error);
         }
@@ -87,7 +89,9 @@ function KnowledgeGraph({ pendingRefresh }) {
         try {
             const response = await fetch('/project');
             const data = await response.json();
-            setProjectName(data.project_name);
+            if (data.message === 'success') {
+                setProjectName(data.project_name);
+            }
         } catch (error) {
             console.error('Error fetching project name:', error);
         }
@@ -117,12 +121,6 @@ function KnowledgeGraph({ pendingRefresh }) {
                     content: 'Tidy',
                     select: function () {
                         applyFcose(false);
-                    }
-                },
-                {
-                    content: 't-SNE',
-                    select: function () {
-                        applyTsne();
                     }
                 },
                 {
@@ -431,7 +429,7 @@ function KnowledgeGraph({ pendingRefresh }) {
 
     function applyFcose(randomize = false) {
         const cy = cytoscapeInstanceRef.current;
-        const scale = 1000;
+        const scale = 500;
 
         var fixedNodeConstraint = [];
         if (viewMode === 'cluster') {
@@ -462,15 +460,6 @@ function KnowledgeGraph({ pendingRefresh }) {
         audioSourceEdges.restore();
         console.log('fCoSE applied');
     };
-
-    function applyTsne() {
-        const cy = cytoscapeInstanceRef.current;
-        const scale = 100;
-        cy.$('node[type="audio"]').forEach((ele) => {
-            ele.position({ 'x': ele.data('tsne_1') * scale, 'y': ele.data('tsne_2') * scale });
-        });
-        console.log('t-SNE applied');
-    }
 
     useEffect(() => {
         if (audioRef.current) {
