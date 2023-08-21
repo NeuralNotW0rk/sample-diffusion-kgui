@@ -93,7 +93,7 @@ function ImportModel() {
             <TextField
                 name='sample_rate'
                 type='number'
-                defaultValue='44100'
+                defaultValue='48000'
                 label='Sample rate'
                 inputProps={{ min: 1 }}
             />

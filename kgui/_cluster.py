@@ -32,6 +32,9 @@ def update_tsne(
 
     samples = np.asarray(samples)
 
+    # Handle if number of samples is smaller than perplexity
+    perplexity = min(perplexity, len(samples) - 1)
+
     # Convert to spectrograms
     # TODO: Save spectrograms for reuse
     print('Extracting spectrograms...')

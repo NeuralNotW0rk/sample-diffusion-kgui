@@ -28,7 +28,7 @@ def import_model(
     # Create model node
     self.G.add_node(
         name,
-        path=str(path.relative_to(self.root)),
+        path=str(path),
         chunk_size=chunk_size,
         sample_rate=sample_rate,
         steps=steps,

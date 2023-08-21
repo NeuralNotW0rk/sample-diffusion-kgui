@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 import os
 import torch
+import math
 from pathlib import Path
 
 from util.util import load_audio, crop_audio
@@ -22,7 +23,9 @@ ARG_TYPES = {
     "batch_size": int,
     "steps": int,
     "seed": int,
+    # Variation
     "noise_level": float,
+    "chunk_interval": int,
 }
 
 app = Flask(__name__)
@@ -84,7 +87,7 @@ def get_type_names():
 @app.route("/graph", methods=["GET"])
 def get_graph():
     if ddkg is not None:
-        return jsonify({'message': 'success', 'graph_data': ddkg.to_json()})
+        return jsonify({"message": "success", "graph_data": ddkg.to_json()})
     else:
         return jsonify({"message:": "no project selected"})
 
@@ -93,7 +96,7 @@ def get_graph():
 @app.route("/graph-tsne", methods=["GET"])
 def get_graph_tsne():
     if ddkg is not None:
-        return jsonify({'message': 'success', 'graph_data': ddkg.to_json('cluster')})
+        return jsonify({"message": "success", "graph_data": ddkg.to_json("cluster")})
     else:
         return jsonify({"message:": "no project selected"})
 
@@ -137,7 +140,7 @@ def import_model():
         chunk_size=int(request.form["chunk_size"]),
         sample_rate=int(request.form["sample_rate"]),
         steps=int(request.form["steps"]),
-        copy=True,
+        copy=False,
     ):
         message = "Model imported successfully"
     else:
@@ -183,29 +186,31 @@ def handle_sd_request():
     args["model_path"] = ddkg.root / model_node["path"]
     args["sample_rate"] = model_node["sample_rate"]
 
+    # Load audio source if specified
+    audio_source = None
+    if args.get("audio_source_name"):
+        audio_node = ddkg.G.nodes[args["audio_source_name"]]
+        audio_source = load_audio(
+            device_accelerator,
+            ddkg.root / audio_node["path"],
+            model_node["sample_rate"],
+        )
+        # Duplicate channel if source is mono
+        if audio_source.size(0) == 1:
+            audio_source = audio_source.repeat(2, 1)
+    else:
+        args["audio_source_name"] = None
+
     request_type = RequestType[args["mode"]]
 
-    if request_type == RequestType.Variation:
-        # Load audio source if specified
-        audio_source = None
-        if args.get("audio_source_name"):
-            audio_node = ddkg.G.nodes[args["audio_source_name"]]
-            audio_source = load_audio(
-                device_accelerator,
-                ddkg.root / audio_node["path"],
-                model_node["sample_rate"],
-            )
-            # Duplicate channel if source is mono
-            if audio_source.size(0) == 1:
-                audio_source = audio_source.repeat(2, 1)
-        else:
-            args["audio_source_name"] = None
-
-        if args["split_chunks"] == "true":
-            source_chunks = list(torch.split(audio_source, args["chunk_size"], dim=-1))
-        else:
-            source_chunks = [audio_source]
-
+    if request_type == RequestType.Variation and args["split_chunks"] == "true":
+        source_chunks = []
+        unfolded = audio_source.unfold(
+            dimension=-1, size=args["chunk_size"], step=args["chunk_interval"]
+        )
+        source_chunks = [
+            unfolded[:, idx, :].squeeze() for idx in range(unfolded.size(-2))
+        ]
         output_chunks = []
         for chunk_index, chunk in enumerate(source_chunks):
             print(f"Processing chunk {chunk_index + 1}/{len(source_chunks)}")
@@ -231,8 +236,26 @@ def handle_sd_request():
             # Get response, then log to ddkg
             output_chunks.append(request_handler.process_request(sd_request).result)
 
-        output = torch.cat(output_chunks, dim=-1)
+        # Recombine chunks
+        output = torch.zeros(args["batch_size"], 2, audio_source.size(-1), device=device_accelerator)
+        left_fade = torch.zeros(args["chunk_size"], device=device_accelerator)
+        left_fade[:] += 1
+        right_fade = torch.zeros(args["chunk_size"], device=device_accelerator)
+        right_fade[:args["chunk_interval"]] += 1
+        mask = torch.zeros(args["chunk_size"], device=device_accelerator)
+        mask[:args["chunk_interval"]] += 1
+        for chunk_index, chunk in enumerate(output_chunks):
+            start = chunk_index * args["chunk_interval"]
+            masked_chunk = chunk
+            if chunk_index > 0:
+                masked_chunk *= left_fade
+            if chunk_index < len(output_chunks):
+                masked_chunk *= right_fade
+            output[:, :, start : start + args["chunk_size"]] += masked_chunk
+
     else:
+        if audio_source is not None:
+            audio_source = crop_audio(audio_source, chunk_size=args["chunk_size"])
         sd_request = Request(
             request_type=request_type,
             model_type=ModelType.DD,
@@ -246,6 +269,7 @@ def handle_sd_request():
                 "sigma_max": 50.0,  # TODO: make configurable
                 "rho": 1.0,  # TODO: make configurable
             },
+            audio_source=audio_source,
             **args,
         )
 
