@@ -1,67 +1,67 @@
-import React, { useContext } from 'react';
-import { Typography, TextField, Button, Stack, ButtonGroup } from '@mui/material';
+import React, { useContext, useRef, useState } from "react";
+import {
+  Typography,
+  TextField,
+  Button,
+  Stack,
+  ButtonGroup,
+} from "@mui/material";
 
-import { ToolContext } from '../App';
+import { ToolContext } from "../App";
 
 function ImportModel() {
-    const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
+  const { setAwaitingResponse, setPendingRefresh } = useContext(ToolContext);
 
-    function handleSubmit(e) {
-        // Prevent the browser from reloading the page
-        e.preventDefault();
+  const [modelPath, setModelPath] = useState("");
+  const pathRef = useRef();
 
-        // Read the form data
-        const form = e.target;
-        const formData = new FormData(form);
+  function handleSubmit(e) {
+    // Prevent the browser from reloading the page
+    e.preventDefault();
 
-        setAwaitingResponse(true);
-        fetch('/import-model', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                setAwaitingResponse(false);
-                setPendingRefresh(true)
-                console.log(data.message); // Success message from the server
-            })
-            .catch(error => {
-                setAwaitingResponse(false);
-                console.error('Error:', error);
+    // Read the form data
+    const form = e.target;
+    const formData = new FormData(form);
 
-            });
+    setAwaitingResponse(true);
+    fetch("/import-model", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setAwaitingResponse(false);
+        setPendingRefresh(true);
+        console.log(data.message); // Success message from the server
+      })
+      .catch((error) => {
+        setAwaitingResponse(false);
+        console.error("Error:", error);
+      });
+  }
 
-    };
-
-    return (
-        <Stack
-            component='form'
-            method='post'
-            onSubmit={handleSubmit}
-            spacing={2}
-            alignItems='center'
-        >
-            <Typography variant='h6'>Import Model</Typography>
-            <TextField
-                name='model_name'
-                label='Model name'
-                required
+  return (
+    <Stack
+      component="form"
+      method="post"
+      onSubmit={handleSubmit}
+      spacing={2}
+      alignItems="center"
+    >
+      <Typography variant="h6">Import Model</Typography>
+      <TextField name="model_name" label="Model name" required />
+      {/*
+            <input
+                type='file'
+                onChange={handleUpload}
+                ref={pathRef}
             />
-            <Button
-                variant='contained'
-                component='label'
-            >
-                Upload File
-                <input
-                    type='file'
-                    hidden
-                />
-            </Button>
-            <TextField
-                name='model_path'
-                label='Model path'
-                required
-            /*
+    */}
+      <TextField
+        name="model_path"
+        label="Model path"
+        required
+        /*
             InputProps={{
                 endAdornment: (
                     <InputAdornment position='end'>
@@ -82,34 +82,34 @@ function ImportModel() {
                 )
             }}
             */
-            />
-            <TextField
-                name='chunk_size'
-                type='number'
-                defaultValue='65536'
-                label='Chunk size'
-                inputProps={{ min: 1 }}
-            />
-            <TextField
-                name='sample_rate'
-                type='number'
-                defaultValue='48000'
-                label='Sample rate'
-                inputProps={{ min: 1 }}
-            />
-            <TextField
-                name='steps'
-                type='number'
-                defaultValue='0'
-                label='Training steps'
-                inputProps={{ min: 0 }}
-            />
-            <ButtonGroup variant='contained' >
-                <Button type='reset'>Default</Button>
-                <Button type='submit'>Import</Button>
-            </ButtonGroup>
-        </Stack>
-    );
-};
+      />
+      <TextField
+        name="chunk_size"
+        type="number"
+        defaultValue="65536"
+        label="Chunk size"
+        inputProps={{ min: 1 }}
+      />
+      <TextField
+        name="sample_rate"
+        type="number"
+        defaultValue="48000"
+        label="Sample rate"
+        inputProps={{ min: 1 }}
+      />
+      <TextField
+        name="steps"
+        type="number"
+        defaultValue="0"
+        label="Training steps"
+        inputProps={{ min: 0 }}
+      />
+      <ButtonGroup variant="contained">
+        <Button type="reset">Default</Button>
+        <Button type="submit">Import</Button>
+      </ButtonGroup>
+    </Stack>
+  );
+}
 
 export default ImportModel;

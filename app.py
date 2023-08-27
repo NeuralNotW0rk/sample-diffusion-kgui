@@ -70,6 +70,17 @@ def get_project():
         return jsonify({"message": "success", "project_name": ddkg.root.name})
     else:
         return jsonify({"message:": "no project selected"})
+    
+# Lists projects currently in the local save directory
+@app.route("/list-projects", methods=["GET"])
+def list_projects():
+    project_names = []
+    for path in PROJECT_DIR.iterdir():
+        if path.is_dir(): project_names.append(path.name)
+    if len(project_names > 0):
+        return jsonify({"message": "success", "project_names": project_names})
+    else:
+        return jsonify({"message:": "no projects found"})
 
 
 # Sends lists of type names for samplers and schedulers
@@ -204,13 +215,17 @@ def handle_sd_request():
     request_type = RequestType[args["mode"]]
 
     if request_type == RequestType.Variation and args["split_chunks"] == "true":
+        # Split into a sequence of smaller variation runs
+        n_chunks = math.ceil(audio_source.size(-1) / args["chunk_interval"])
+        # The following could be used to avoid some padding:
+        # n_chunks = math.ceil((audio_source.size(1) - args['chunk_size']) / args['chunk_interval']) + 1
         source_chunks = []
-        unfolded = audio_source.unfold(
-            dimension=-1, size=args["chunk_size"], step=args["chunk_interval"]
-        )
-        source_chunks = [
-            unfolded[:, idx, :].squeeze() for idx in range(unfolded.size(-2))
-        ]
+        for chunk_index in range(n_chunks):
+            chunk = torch.zeros(2, args["chunk_size"], device=device_accelerator)
+            start = chunk_index * args["chunk_interval"]
+            end = min(start + args["chunk_size"], audio_source.size(-1))
+            chunk[:, : end - start] += audio_source[:, start:end]
+            source_chunks.append(chunk)
         output_chunks = []
         for chunk_index, chunk in enumerate(source_chunks):
             print(f"Processing chunk {chunk_index + 1}/{len(source_chunks)}")
@@ -237,21 +252,30 @@ def handle_sd_request():
             output_chunks.append(request_handler.process_request(sd_request).result)
 
         # Recombine chunks
-        output = torch.zeros(args["batch_size"], 2, audio_source.size(-1), device=device_accelerator)
+        output = torch.zeros(
+            args["batch_size"], 2, audio_source.size(-1), device=device_accelerator
+        )
+        overlap = args['chunk_size'] - args["chunk_interval"]
         left_fade = torch.zeros(args["chunk_size"], device=device_accelerator)
-        left_fade[:] += 1
         right_fade = torch.zeros(args["chunk_size"], device=device_accelerator)
-        right_fade[:args["chunk_interval"]] += 1
+        if args["crossfade"]:
+            left_fade[:overlap] += torch.linspace(0, 1, overlap, device=device_accelerator)
+            left_fade[overlap:] += 1
+            right_fade[-overlap:] += torch.linspace(1, 0, overlap, device=device_accelerator)
+            right_fade[:-overlap] += 1
+        else:
+            left_fade[:] += 1
+            right_fade[: args["chunk_interval"]] += 1
         mask = torch.zeros(args["chunk_size"], device=device_accelerator)
-        mask[:args["chunk_interval"]] += 1
+        mask[: args["chunk_interval"]] += 1
         for chunk_index, chunk in enumerate(output_chunks):
             start = chunk_index * args["chunk_interval"]
-            masked_chunk = chunk
+            end = min(start + args["chunk_size"], output.size(-1))
             if chunk_index > 0:
-                masked_chunk *= left_fade
+                chunk *= left_fade
             if chunk_index < len(output_chunks):
-                masked_chunk *= right_fade
-            output[:, :, start : start + args["chunk_size"]] += masked_chunk
+                chunk *= right_fade
+            output[:, :, start:end] += chunk[:, :, : end - start]
 
     else:
         if audio_source is not None:
